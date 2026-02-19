@@ -33,12 +33,73 @@ enum RpcResult<T> {
 }
 
 /// JSON-RPC error returned by the NEAR node.
+///
+/// NEAR's RPC extends the standard JSON-RPC error with `name` and `cause` fields
+/// that carry structured, typed error information. The `data` field is deprecated
+/// in nearcore and typically contains only a human-readable string.
+///
+/// # Error structure
+///
+/// For handler errors (most RPC failures), the response looks like:
+///
+/// ```json
+/// {
+///   "code": -32000,
+///   "message": "Server error",
+///   "data": "...",
+///   "name": "HANDLER_ERROR",
+///   "cause": { "name": "UNKNOWN_BLOCK", "info": { ... } }
+/// }
+/// ```
+///
+/// The `cause` field contains the per-method typed error, which can be
+/// deserialized into the appropriate error type (e.g., `RpcBlockError`).
 #[derive(Debug, Deserialize, thiserror::Error)]
 #[error("RPC error {code}: {message}")]
 pub struct RpcError {
     pub code: i64,
     pub message: String,
+    /// Deprecated by nearcore. Prefer `cause` for structured error data.
+    #[serde(default)]
     pub data: Option<serde_json::Value>,
+    /// Error category: `HANDLER_ERROR`, `REQUEST_VALIDATION_ERROR`, or `INTERNAL_ERROR`.
+    #[serde(default)]
+    pub name: Option<String>,
+    /// Structured error detail. For handler errors, contains `{"name": "...", "info": {...}}`.
+    #[serde(default)]
+    pub cause: Option<RpcErrorCause>,
+}
+
+/// Structured cause of an RPC error.
+#[derive(Debug, Clone, Deserialize)]
+pub struct RpcErrorCause {
+    /// The error variant name (e.g., `UNKNOWN_BLOCK`, `INVALID_ACCOUNT`).
+    pub name: String,
+    /// Additional structured information about the error.
+    #[serde(default)]
+    pub info: Option<serde_json::Value>,
+}
+
+impl RpcError {
+    /// Returns `true` if this is a handler error (a method-specific failure).
+    pub fn is_handler_error(&self) -> bool {
+        self.name.as_deref() == Some("HANDLER_ERROR")
+    }
+
+    /// Returns `true` if this is a request validation error.
+    pub fn is_request_validation_error(&self) -> bool {
+        self.name.as_deref() == Some("REQUEST_VALIDATION_ERROR")
+    }
+
+    /// Returns `true` if this is an internal error (timeout, connection closed, etc).
+    pub fn is_internal_error(&self) -> bool {
+        self.name.as_deref() == Some("INTERNAL_ERROR")
+    }
+
+    /// Returns the error cause name if available (e.g., `"UNKNOWN_BLOCK"`).
+    pub fn cause_name(&self) -> Option<&str> {
+        self.cause.as_ref().map(|c| c.name.as_str())
+    }
 }
 
 /// Client error type.
