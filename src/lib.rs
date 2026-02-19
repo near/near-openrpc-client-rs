@@ -24,8 +24,11 @@
 //! }
 //! ```
 
+mod query_helpers;
 mod token_helpers;
 pub mod types;
+
+pub use query_helpers::BlockReference;
 
 #[cfg(feature = "client")]
 pub mod client;
