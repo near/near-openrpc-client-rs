@@ -1,7 +1,8 @@
 [package]
 name = "near-openrpc-client"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
+rust-version = "1.88"
 description = "Generated Rust types and async client for the NEAR Protocol JSON-RPC API, built from the official OpenRPC specification"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/near/near-openrpc-client-rs"
@@ -12,10 +13,10 @@ readme = "README.md"
 [dependencies]
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-regress = "0.10.4"
+regress = "0.10"
 chrono = { version = "0.4", features = ["serde"] }
 thiserror = "2"
-reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"], optional = true }
+reqwest = { version = "0.13", default-features = false, features = ["json", "rustls"], optional = true }
 tokio = { version = "1", features = ["rt-multi-thread", "macros"], optional = true }
 
 [build-dependencies]

@@ -75,10 +75,10 @@ fn expand_allof_refs(schema: &mut serde_json::Value) {
             let def_keys: Vec<String> = defs.keys().cloned().collect();
 
             for key in def_keys {
-                if let Some(def) = defs.get(&key).cloned() {
-                    if let Some(expanded) = try_expand_allof(&def, defs) {
-                        defs.insert(key, expanded);
-                    }
+                if let Some(def) = defs.get(&key).cloned()
+                    && let Some(expanded) = try_expand_allof(&def, defs)
+                {
+                    defs.insert(key, expanded);
                 }
             }
         }
@@ -184,19 +184,19 @@ fn merge_variant_properties(
     let mut required: Vec<String> = Vec::new();
     if let Some(a_req) = a_obj.get("required").and_then(|r| r.as_array()) {
         for r in a_req {
-            if let Some(s) = r.as_str() {
-                if !required.contains(&s.to_string()) {
-                    required.push(s.to_string());
-                }
+            if let Some(s) = r.as_str()
+                && !required.contains(&s.to_string())
+            {
+                required.push(s.to_string());
             }
         }
     }
     if let Some(b_req) = b_obj.get("required").and_then(|r| r.as_array()) {
         for r in b_req {
-            if let Some(s) = r.as_str() {
-                if !required.contains(&s.to_string()) {
-                    required.push(s.to_string());
-                }
+            if let Some(s) = r.as_str()
+                && !required.contains(&s.to_string())
+            {
+                required.push(s.to_string());
             }
         }
     }
