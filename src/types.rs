@@ -95,4 +95,66 @@ mod tests {
         let v2: serde_json::Value = serde_json::from_str(&json_str2).unwrap();
         assert_eq!(v1, v2);
     }
+
+    #[test]
+    fn rpc_query_request_deserializes_block_id_variant() {
+        let json = serde_json::json!({
+            "request_type": "view_account",
+            "account_id": "example.near",
+            "block_id": 99999
+        });
+        let req: RpcQueryRequest = serde_json::from_value(json).unwrap();
+        let reserialized = serde_json::to_value(&req).unwrap();
+        assert_eq!(reserialized["request_type"], "view_account");
+        assert_eq!(reserialized["block_id"], 99999);
+        // Must not have finality or sync_checkpoint
+        assert!(reserialized.get("finality").is_none());
+        assert!(reserialized.get("sync_checkpoint").is_none());
+    }
+
+    #[test]
+    fn rpc_query_request_deserializes_sync_checkpoint_variant() {
+        let json = serde_json::json!({
+            "request_type": "view_account",
+            "account_id": "example.near",
+            "sync_checkpoint": "genesis"
+        });
+        let req: RpcQueryRequest = serde_json::from_value(json).unwrap();
+        let reserialized = serde_json::to_value(&req).unwrap();
+        assert_eq!(reserialized["request_type"], "view_account");
+        assert_eq!(reserialized["sync_checkpoint"], "genesis");
+        assert!(reserialized.get("block_id").is_none());
+        assert!(reserialized.get("finality").is_none());
+    }
+
+    #[test]
+    fn rpc_query_request_deserializes_finality_variant() {
+        let json = serde_json::json!({
+            "request_type": "view_account",
+            "account_id": "example.near",
+            "finality": "final"
+        });
+        let req: RpcQueryRequest = serde_json::from_value(json).unwrap();
+        let reserialized = serde_json::to_value(&req).unwrap();
+        assert_eq!(reserialized["request_type"], "view_account");
+        assert_eq!(reserialized["finality"], "final");
+        assert!(reserialized.get("block_id").is_none());
+        assert!(reserialized.get("sync_checkpoint").is_none());
+    }
+
+    #[test]
+    fn rpc_query_request_call_function_block_id_roundtrip() {
+        let json = serde_json::json!({
+            "request_type": "call_function",
+            "account_id": "example.near",
+            "method_name": "get_num",
+            "args_base64": "e30=",
+            "block_id": 42
+        });
+        let req: RpcQueryRequest = serde_json::from_value(json.clone()).unwrap();
+        let reserialized = serde_json::to_value(&req).unwrap();
+        assert_eq!(reserialized["request_type"], "call_function");
+        assert_eq!(reserialized["block_id"], 42);
+        assert_eq!(reserialized["method_name"], "get_num");
+    }
 }

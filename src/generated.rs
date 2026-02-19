@@ -56,78 +56,6 @@ pub struct AccessKeyCreationConfigView {
     ///Cost per byte of method_names of creating a restricted access-key.
     pub function_call_cost_per_byte: Fee,
 }
-///`AccessKeyDeletionChange`
-///
-#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
-pub struct AccessKeyDeletionChange {
-    pub account_id: AccountId,
-    pub public_key: PublicKey,
-}
-///`AccessKeyDeletionType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum AccessKeyDeletionType {
-    #[serde(rename = "access_key_deletion")]
-    AccessKeyDeletion,
-}
-impl ::std::fmt::Display for AccessKeyDeletionType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::AccessKeyDeletion => f.write_str("access_key_deletion"),
-        }
-    }
-}
-impl ::std::str::FromStr for AccessKeyDeletionType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "access_key_deletion" => Ok(Self::AccessKeyDeletion),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for AccessKeyDeletionType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String> for AccessKeyDeletionType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String> for AccessKeyDeletionType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for AccessKeyDeletionType {
-    fn default() -> Self {
-        AccessKeyDeletionType::AccessKeyDeletion
-    }
-}
 ///Describes information about an access key including the public key.
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
@@ -192,416 +120,12 @@ pub enum AccessKeyPermissionView {
     },
     GasKeyFullAccess { balance: NearToken, num_nonces: u16 },
 }
-///`AccessKeyTouchedType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum AccessKeyTouchedType {
-    #[serde(rename = "access_key_touched")]
-    AccessKeyTouched,
-}
-impl ::std::fmt::Display for AccessKeyTouchedType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::AccessKeyTouched => f.write_str("access_key_touched"),
-        }
-    }
-}
-impl ::std::str::FromStr for AccessKeyTouchedType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "access_key_touched" => Ok(Self::AccessKeyTouched),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for AccessKeyTouchedType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String> for AccessKeyTouchedType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String> for AccessKeyTouchedType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for AccessKeyTouchedType {
-    fn default() -> Self {
-        AccessKeyTouchedType::AccessKeyTouched
-    }
-}
-///`AccessKeyUpdateChange`
-///
-#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
-pub struct AccessKeyUpdateChange {
-    pub access_key: AccessKeyView,
-    pub account_id: AccountId,
-    pub public_key: PublicKey,
-}
-///`AccessKeyUpdateType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum AccessKeyUpdateType {
-    #[serde(rename = "access_key_update")]
-    AccessKeyUpdate,
-}
-impl ::std::fmt::Display for AccessKeyUpdateType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::AccessKeyUpdate => f.write_str("access_key_update"),
-        }
-    }
-}
-impl ::std::str::FromStr for AccessKeyUpdateType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "access_key_update" => Ok(Self::AccessKeyUpdate),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for AccessKeyUpdateType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String> for AccessKeyUpdateType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String> for AccessKeyUpdateType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for AccessKeyUpdateType {
-    fn default() -> Self {
-        AccessKeyUpdateType::AccessKeyUpdate
-    }
-}
 ///Describes access key permission scope and nonce.
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
 pub struct AccessKeyView {
     pub nonce: u64,
     pub permission: AccessKeyPermissionView,
-}
-///`AccountChangesBlockIdChangesType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum AccountChangesBlockIdChangesType {
-    #[serde(rename = "account_changes")]
-    AccountChanges,
-}
-impl ::std::fmt::Display for AccountChangesBlockIdChangesType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::AccountChanges => f.write_str("account_changes"),
-        }
-    }
-}
-impl ::std::str::FromStr for AccountChangesBlockIdChangesType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "account_changes" => Ok(Self::AccountChanges),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for AccountChangesBlockIdChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String>
-for AccountChangesBlockIdChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String>
-for AccountChangesBlockIdChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for AccountChangesBlockIdChangesType {
-    fn default() -> Self {
-        AccountChangesBlockIdChangesType::AccountChanges
-    }
-}
-///`AccountChangesChangesType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum AccountChangesChangesType {
-    #[serde(rename = "account_changes")]
-    AccountChanges,
-}
-impl ::std::fmt::Display for AccountChangesChangesType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::AccountChanges => f.write_str("account_changes"),
-        }
-    }
-}
-impl ::std::str::FromStr for AccountChangesChangesType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "account_changes" => Ok(Self::AccountChanges),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for AccountChangesChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String> for AccountChangesChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String> for AccountChangesChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for AccountChangesChangesType {
-    fn default() -> Self {
-        AccountChangesChangesType::AccountChanges
-    }
-}
-///`AccountChangesFinalityChangesType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum AccountChangesFinalityChangesType {
-    #[serde(rename = "account_changes")]
-    AccountChanges,
-}
-impl ::std::fmt::Display for AccountChangesFinalityChangesType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::AccountChanges => f.write_str("account_changes"),
-        }
-    }
-}
-impl ::std::str::FromStr for AccountChangesFinalityChangesType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "account_changes" => Ok(Self::AccountChanges),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for AccountChangesFinalityChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String>
-for AccountChangesFinalityChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String>
-for AccountChangesFinalityChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for AccountChangesFinalityChangesType {
-    fn default() -> Self {
-        AccountChangesFinalityChangesType::AccountChanges
-    }
-}
-///`AccountChangesSyncCheckpointChangesType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum AccountChangesSyncCheckpointChangesType {
-    #[serde(rename = "account_changes")]
-    AccountChanges,
-}
-impl ::std::fmt::Display for AccountChangesSyncCheckpointChangesType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::AccountChanges => f.write_str("account_changes"),
-        }
-    }
-}
-impl ::std::str::FromStr for AccountChangesSyncCheckpointChangesType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "account_changes" => Ok(Self::AccountChanges),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for AccountChangesSyncCheckpointChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String>
-for AccountChangesSyncCheckpointChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String>
-for AccountChangesSyncCheckpointChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for AccountChangesSyncCheckpointChangesType {
-    fn default() -> Self {
-        AccountChangesSyncCheckpointChangesType::AccountChanges
-    }
 }
 ///The structure describes configuration for creation of new accounts.
 ///
@@ -638,77 +162,6 @@ messages to the validator.*/
     pub proxies: ::std::vec::Vec<Tier1ProxyView>,
     ///UTC timestamp of when the AccountData has been signed.
     pub timestamp: ::std::string::String,
-}
-///`AccountDeletionChange`
-///
-#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
-pub struct AccountDeletionChange {
-    pub account_id: AccountId,
-}
-///`AccountDeletionType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum AccountDeletionType {
-    #[serde(rename = "account_deletion")]
-    AccountDeletion,
-}
-impl ::std::fmt::Display for AccountDeletionType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::AccountDeletion => f.write_str("account_deletion"),
-        }
-    }
-}
-impl ::std::str::FromStr for AccountDeletionType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "account_deletion" => Ok(Self::AccountDeletion),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for AccountDeletionType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String> for AccountDeletionType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String> for AccountDeletionType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for AccountDeletionType {
-    fn default() -> Self {
-        AccountDeletionType::AccountDeletion
-    }
 }
 /**NEAR Account Identifier.
 
@@ -819,153 +272,6 @@ pub struct AccountInfo {
     pub account_id: AccountId,
     pub amount: NearToken,
     pub public_key: PublicKey,
-}
-///`AccountTouchedType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum AccountTouchedType {
-    #[serde(rename = "account_touched")]
-    AccountTouched,
-}
-impl ::std::fmt::Display for AccountTouchedType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::AccountTouched => f.write_str("account_touched"),
-        }
-    }
-}
-impl ::std::str::FromStr for AccountTouchedType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "account_touched" => Ok(Self::AccountTouched),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for AccountTouchedType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String> for AccountTouchedType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String> for AccountTouchedType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for AccountTouchedType {
-    fn default() -> Self {
-        AccountTouchedType::AccountTouched
-    }
-}
-///A view of the account
-///
-#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
-pub struct AccountUpdateChange {
-    pub account_id: AccountId,
-    pub amount: NearToken,
-    pub code_hash: CryptoHash,
-    #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
-    pub global_contract_account_id: ::std::option::Option<AccountId>,
-    #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
-    pub global_contract_hash: ::std::option::Option<CryptoHash>,
-    pub locked: NearToken,
-    ///TODO(2271): deprecated.
-    #[serde(default)]
-    pub storage_paid_at: u64,
-    pub storage_usage: u64,
-}
-///`AccountUpdateType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum AccountUpdateType {
-    #[serde(rename = "account_update")]
-    AccountUpdate,
-}
-impl ::std::fmt::Display for AccountUpdateType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::AccountUpdate => f.write_str("account_update"),
-        }
-    }
-}
-impl ::std::str::FromStr for AccountUpdateType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "account_update" => Ok(Self::AccountUpdate),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for AccountUpdateType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String> for AccountUpdateType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String> for AccountUpdateType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for AccountUpdateType {
-    fn default() -> Self {
-        AccountUpdateType::AccountUpdate
-    }
 }
 ///A view of the account
 ///
@@ -1131,142 +437,6 @@ impl ::std::convert::From<InvalidAccessKeyError> for ActionErrorKind {
         Self::DelegateActionAccessKeyError(value)
     }
 }
-///`ActionReceiptGasRewardType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum ActionReceiptGasRewardType {
-    #[serde(rename = "action_receipt_gas_reward")]
-    ActionReceiptGasReward,
-}
-impl ::std::fmt::Display for ActionReceiptGasRewardType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::ActionReceiptGasReward => f.write_str("action_receipt_gas_reward"),
-        }
-    }
-}
-impl ::std::str::FromStr for ActionReceiptGasRewardType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "action_receipt_gas_reward" => Ok(Self::ActionReceiptGasReward),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for ActionReceiptGasRewardType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String> for ActionReceiptGasRewardType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String> for ActionReceiptGasRewardType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for ActionReceiptGasRewardType {
-    fn default() -> Self {
-        ActionReceiptGasRewardType::ActionReceiptGasReward
-    }
-}
-///`ActionReceiptProcessingStartedType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum ActionReceiptProcessingStartedType {
-    #[serde(rename = "action_receipt_processing_started")]
-    ActionReceiptProcessingStarted,
-}
-impl ::std::fmt::Display for ActionReceiptProcessingStartedType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::ActionReceiptProcessingStarted => {
-                f.write_str("action_receipt_processing_started")
-            }
-        }
-    }
-}
-impl ::std::str::FromStr for ActionReceiptProcessingStartedType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "action_receipt_processing_started" => {
-                Ok(Self::ActionReceiptProcessingStarted)
-            }
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for ActionReceiptProcessingStartedType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String>
-for ActionReceiptProcessingStartedType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String>
-for ActionReceiptProcessingStartedType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for ActionReceiptProcessingStartedType {
-    fn default() -> Self {
-        ActionReceiptProcessingStartedType::ActionReceiptProcessingStarted
-    }
-}
 ///`ActionView`
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
@@ -1354,272 +524,6 @@ pub struct AddKeyAction {
     ///A public key which will be associated with an access_key
     pub public_key: PublicKey,
 }
-///`AllAccessKeyChangesBlockIdChangesType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum AllAccessKeyChangesBlockIdChangesType {
-    #[serde(rename = "all_access_key_changes")]
-    AllAccessKeyChanges,
-}
-impl ::std::fmt::Display for AllAccessKeyChangesBlockIdChangesType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::AllAccessKeyChanges => f.write_str("all_access_key_changes"),
-        }
-    }
-}
-impl ::std::str::FromStr for AllAccessKeyChangesBlockIdChangesType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "all_access_key_changes" => Ok(Self::AllAccessKeyChanges),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for AllAccessKeyChangesBlockIdChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String>
-for AllAccessKeyChangesBlockIdChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String>
-for AllAccessKeyChangesBlockIdChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for AllAccessKeyChangesBlockIdChangesType {
-    fn default() -> Self {
-        AllAccessKeyChangesBlockIdChangesType::AllAccessKeyChanges
-    }
-}
-///`AllAccessKeyChangesChangesType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum AllAccessKeyChangesChangesType {
-    #[serde(rename = "all_access_key_changes")]
-    AllAccessKeyChanges,
-}
-impl ::std::fmt::Display for AllAccessKeyChangesChangesType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::AllAccessKeyChanges => f.write_str("all_access_key_changes"),
-        }
-    }
-}
-impl ::std::str::FromStr for AllAccessKeyChangesChangesType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "all_access_key_changes" => Ok(Self::AllAccessKeyChanges),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for AllAccessKeyChangesChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String> for AllAccessKeyChangesChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String> for AllAccessKeyChangesChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for AllAccessKeyChangesChangesType {
-    fn default() -> Self {
-        AllAccessKeyChangesChangesType::AllAccessKeyChanges
-    }
-}
-///`AllAccessKeyChangesFinalityChangesType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum AllAccessKeyChangesFinalityChangesType {
-    #[serde(rename = "all_access_key_changes")]
-    AllAccessKeyChanges,
-}
-impl ::std::fmt::Display for AllAccessKeyChangesFinalityChangesType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::AllAccessKeyChanges => f.write_str("all_access_key_changes"),
-        }
-    }
-}
-impl ::std::str::FromStr for AllAccessKeyChangesFinalityChangesType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "all_access_key_changes" => Ok(Self::AllAccessKeyChanges),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for AllAccessKeyChangesFinalityChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String>
-for AllAccessKeyChangesFinalityChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String>
-for AllAccessKeyChangesFinalityChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for AllAccessKeyChangesFinalityChangesType {
-    fn default() -> Self {
-        AllAccessKeyChangesFinalityChangesType::AllAccessKeyChanges
-    }
-}
-///`AllAccessKeyChangesSyncCheckpointChangesType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum AllAccessKeyChangesSyncCheckpointChangesType {
-    #[serde(rename = "all_access_key_changes")]
-    AllAccessKeyChanges,
-}
-impl ::std::fmt::Display for AllAccessKeyChangesSyncCheckpointChangesType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::AllAccessKeyChanges => f.write_str("all_access_key_changes"),
-        }
-    }
-}
-impl ::std::str::FromStr for AllAccessKeyChangesSyncCheckpointChangesType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "all_access_key_changes" => Ok(Self::AllAccessKeyChanges),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for AllAccessKeyChangesSyncCheckpointChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String>
-for AllAccessKeyChangesSyncCheckpointChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String>
-for AllAccessKeyChangesSyncCheckpointChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for AllAccessKeyChangesSyncCheckpointChangesType {
-    fn default() -> Self {
-        AllAccessKeyChangesSyncCheckpointChangesType::AllAccessKeyChanges
-    }
-}
 /**`BandwidthRequest` describes the size of receipts that a shard would like to send to another shard.
 When a shard wants to send a lot of receipts to another shard, it needs to create a request and wait
 for a bandwidth grant from the bandwidth scheduler.*/
@@ -1655,75 +559,6 @@ impl ::std::convert::From<BandwidthRequestsV1> for BandwidthRequests {
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
 pub struct BandwidthRequestsV1 {
     pub requests: ::std::vec::Vec<BandwidthRequest>,
-}
-///`BandwidthSchedulerStateUpdateType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum BandwidthSchedulerStateUpdateType {
-    #[serde(rename = "bandwidth_scheduler_state_update")]
-    BandwidthSchedulerStateUpdate,
-}
-impl ::std::fmt::Display for BandwidthSchedulerStateUpdateType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::BandwidthSchedulerStateUpdate => {
-                f.write_str("bandwidth_scheduler_state_update")
-            }
-        }
-    }
-}
-impl ::std::str::FromStr for BandwidthSchedulerStateUpdateType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "bandwidth_scheduler_state_update" => Ok(Self::BandwidthSchedulerStateUpdate),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for BandwidthSchedulerStateUpdateType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String>
-for BandwidthSchedulerStateUpdateType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String>
-for BandwidthSchedulerStateUpdateType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for BandwidthSchedulerStateUpdateType {
-    fn default() -> Self {
-        BandwidthSchedulerStateUpdateType::BandwidthSchedulerStateUpdate
-    }
 }
 ///A part of a state for the current head of a light client. More info [here](https://nomicon.io/ChainSpec/LightClient).
 ///
@@ -2383,480 +1218,6 @@ pub struct CongestionInfoView {
     pub delayed_receipts_gas: ::std::string::String,
     pub receipt_bytes: u64,
 }
-///`ContractCodeChangesBlockIdChangesType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum ContractCodeChangesBlockIdChangesType {
-    #[serde(rename = "contract_code_changes")]
-    ContractCodeChanges,
-}
-impl ::std::fmt::Display for ContractCodeChangesBlockIdChangesType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::ContractCodeChanges => f.write_str("contract_code_changes"),
-        }
-    }
-}
-impl ::std::str::FromStr for ContractCodeChangesBlockIdChangesType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "contract_code_changes" => Ok(Self::ContractCodeChanges),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for ContractCodeChangesBlockIdChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String>
-for ContractCodeChangesBlockIdChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String>
-for ContractCodeChangesBlockIdChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for ContractCodeChangesBlockIdChangesType {
-    fn default() -> Self {
-        ContractCodeChangesBlockIdChangesType::ContractCodeChanges
-    }
-}
-///`ContractCodeChangesChangesType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum ContractCodeChangesChangesType {
-    #[serde(rename = "contract_code_changes")]
-    ContractCodeChanges,
-}
-impl ::std::fmt::Display for ContractCodeChangesChangesType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::ContractCodeChanges => f.write_str("contract_code_changes"),
-        }
-    }
-}
-impl ::std::str::FromStr for ContractCodeChangesChangesType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "contract_code_changes" => Ok(Self::ContractCodeChanges),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for ContractCodeChangesChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String> for ContractCodeChangesChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String> for ContractCodeChangesChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for ContractCodeChangesChangesType {
-    fn default() -> Self {
-        ContractCodeChangesChangesType::ContractCodeChanges
-    }
-}
-///`ContractCodeChangesFinalityChangesType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum ContractCodeChangesFinalityChangesType {
-    #[serde(rename = "contract_code_changes")]
-    ContractCodeChanges,
-}
-impl ::std::fmt::Display for ContractCodeChangesFinalityChangesType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::ContractCodeChanges => f.write_str("contract_code_changes"),
-        }
-    }
-}
-impl ::std::str::FromStr for ContractCodeChangesFinalityChangesType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "contract_code_changes" => Ok(Self::ContractCodeChanges),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for ContractCodeChangesFinalityChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String>
-for ContractCodeChangesFinalityChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String>
-for ContractCodeChangesFinalityChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for ContractCodeChangesFinalityChangesType {
-    fn default() -> Self {
-        ContractCodeChangesFinalityChangesType::ContractCodeChanges
-    }
-}
-///`ContractCodeChangesSyncCheckpointChangesType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum ContractCodeChangesSyncCheckpointChangesType {
-    #[serde(rename = "contract_code_changes")]
-    ContractCodeChanges,
-}
-impl ::std::fmt::Display for ContractCodeChangesSyncCheckpointChangesType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::ContractCodeChanges => f.write_str("contract_code_changes"),
-        }
-    }
-}
-impl ::std::str::FromStr for ContractCodeChangesSyncCheckpointChangesType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "contract_code_changes" => Ok(Self::ContractCodeChanges),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for ContractCodeChangesSyncCheckpointChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String>
-for ContractCodeChangesSyncCheckpointChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String>
-for ContractCodeChangesSyncCheckpointChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for ContractCodeChangesSyncCheckpointChangesType {
-    fn default() -> Self {
-        ContractCodeChangesSyncCheckpointChangesType::ContractCodeChanges
-    }
-}
-///`ContractCodeDeletionChange`
-///
-#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
-pub struct ContractCodeDeletionChange {
-    pub account_id: AccountId,
-}
-///`ContractCodeDeletionType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum ContractCodeDeletionType {
-    #[serde(rename = "contract_code_deletion")]
-    ContractCodeDeletion,
-}
-impl ::std::fmt::Display for ContractCodeDeletionType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::ContractCodeDeletion => f.write_str("contract_code_deletion"),
-        }
-    }
-}
-impl ::std::str::FromStr for ContractCodeDeletionType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "contract_code_deletion" => Ok(Self::ContractCodeDeletion),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for ContractCodeDeletionType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String> for ContractCodeDeletionType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String> for ContractCodeDeletionType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for ContractCodeDeletionType {
-    fn default() -> Self {
-        ContractCodeDeletionType::ContractCodeDeletion
-    }
-}
-///`ContractCodeTouchedType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum ContractCodeTouchedType {
-    #[serde(rename = "contract_code_touched")]
-    ContractCodeTouched,
-}
-impl ::std::fmt::Display for ContractCodeTouchedType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::ContractCodeTouched => f.write_str("contract_code_touched"),
-        }
-    }
-}
-impl ::std::str::FromStr for ContractCodeTouchedType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "contract_code_touched" => Ok(Self::ContractCodeTouched),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for ContractCodeTouchedType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String> for ContractCodeTouchedType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String> for ContractCodeTouchedType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for ContractCodeTouchedType {
-    fn default() -> Self {
-        ContractCodeTouchedType::ContractCodeTouched
-    }
-}
-///`ContractCodeUpdateChange`
-///
-#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
-pub struct ContractCodeUpdateChange {
-    pub account_id: AccountId,
-    pub code_base64: ::std::string::String,
-}
-///`ContractCodeUpdateType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum ContractCodeUpdateType {
-    #[serde(rename = "contract_code_update")]
-    ContractCodeUpdate,
-}
-impl ::std::fmt::Display for ContractCodeUpdateType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::ContractCodeUpdate => f.write_str("contract_code_update"),
-        }
-    }
-}
-impl ::std::str::FromStr for ContractCodeUpdateType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "contract_code_update" => Ok(Self::ContractCodeUpdate),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for ContractCodeUpdateType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String> for ContractCodeUpdateType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String> for ContractCodeUpdateType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for ContractCodeUpdateType {
-    fn default() -> Self {
-        ContractCodeUpdateType::ContractCodeUpdate
-    }
-}
 ///A view of the contract code.
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
@@ -2978,340 +1339,6 @@ Each entry in the array corresponds to the shard in the `shards_endorsed` array.
     pub shards_endorsed: ::std::vec::Vec<ShardId>,
     pub stake: NearToken,
 }
-///`DataChangesBlockIdChangesType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum DataChangesBlockIdChangesType {
-    #[serde(rename = "data_changes")]
-    DataChanges,
-}
-impl ::std::fmt::Display for DataChangesBlockIdChangesType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::DataChanges => f.write_str("data_changes"),
-        }
-    }
-}
-impl ::std::str::FromStr for DataChangesBlockIdChangesType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "data_changes" => Ok(Self::DataChanges),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for DataChangesBlockIdChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String> for DataChangesBlockIdChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String> for DataChangesBlockIdChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for DataChangesBlockIdChangesType {
-    fn default() -> Self {
-        DataChangesBlockIdChangesType::DataChanges
-    }
-}
-///`DataChangesChangesType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum DataChangesChangesType {
-    #[serde(rename = "data_changes")]
-    DataChanges,
-}
-impl ::std::fmt::Display for DataChangesChangesType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::DataChanges => f.write_str("data_changes"),
-        }
-    }
-}
-impl ::std::str::FromStr for DataChangesChangesType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "data_changes" => Ok(Self::DataChanges),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for DataChangesChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String> for DataChangesChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String> for DataChangesChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for DataChangesChangesType {
-    fn default() -> Self {
-        DataChangesChangesType::DataChanges
-    }
-}
-///`DataChangesFinalityChangesType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum DataChangesFinalityChangesType {
-    #[serde(rename = "data_changes")]
-    DataChanges,
-}
-impl ::std::fmt::Display for DataChangesFinalityChangesType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::DataChanges => f.write_str("data_changes"),
-        }
-    }
-}
-impl ::std::str::FromStr for DataChangesFinalityChangesType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "data_changes" => Ok(Self::DataChanges),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for DataChangesFinalityChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String> for DataChangesFinalityChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String> for DataChangesFinalityChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for DataChangesFinalityChangesType {
-    fn default() -> Self {
-        DataChangesFinalityChangesType::DataChanges
-    }
-}
-///`DataChangesSyncCheckpointChangesType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum DataChangesSyncCheckpointChangesType {
-    #[serde(rename = "data_changes")]
-    DataChanges,
-}
-impl ::std::fmt::Display for DataChangesSyncCheckpointChangesType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::DataChanges => f.write_str("data_changes"),
-        }
-    }
-}
-impl ::std::str::FromStr for DataChangesSyncCheckpointChangesType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "data_changes" => Ok(Self::DataChanges),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for DataChangesSyncCheckpointChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String>
-for DataChangesSyncCheckpointChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String>
-for DataChangesSyncCheckpointChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for DataChangesSyncCheckpointChangesType {
-    fn default() -> Self {
-        DataChangesSyncCheckpointChangesType::DataChanges
-    }
-}
-///`DataDeletionChange`
-///
-#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
-pub struct DataDeletionChange {
-    pub account_id: AccountId,
-    pub key_base64: StoreKey,
-}
-///`DataDeletionType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum DataDeletionType {
-    #[serde(rename = "data_deletion")]
-    DataDeletion,
-}
-impl ::std::fmt::Display for DataDeletionType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::DataDeletion => f.write_str("data_deletion"),
-        }
-    }
-}
-impl ::std::str::FromStr for DataDeletionType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "data_deletion" => Ok(Self::DataDeletion),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for DataDeletionType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String> for DataDeletionType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String> for DataDeletionType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for DataDeletionType {
-    fn default() -> Self {
-        DataDeletionType::DataDeletion
-    }
-}
 ///The fees settings for a data receipt creation
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
@@ -3336,144 +1363,6 @@ Both `send` and `exec` costs are burned when a function call finishes execution 
 pub struct DataReceiverView {
     pub data_id: CryptoHash,
     pub receiver_id: AccountId,
-}
-///`DataTouchedType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum DataTouchedType {
-    #[serde(rename = "data_touched")]
-    DataTouched,
-}
-impl ::std::fmt::Display for DataTouchedType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::DataTouched => f.write_str("data_touched"),
-        }
-    }
-}
-impl ::std::str::FromStr for DataTouchedType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "data_touched" => Ok(Self::DataTouched),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for DataTouchedType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String> for DataTouchedType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String> for DataTouchedType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for DataTouchedType {
-    fn default() -> Self {
-        DataTouchedType::DataTouched
-    }
-}
-///`DataUpdateChange`
-///
-#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
-pub struct DataUpdateChange {
-    pub account_id: AccountId,
-    pub key_base64: StoreKey,
-    pub value_base64: StoreValue,
-}
-///`DataUpdateType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum DataUpdateType {
-    #[serde(rename = "data_update")]
-    DataUpdate,
-}
-impl ::std::fmt::Display for DataUpdateType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::DataUpdate => f.write_str("data_update"),
-        }
-    }
-}
-impl ::std::str::FromStr for DataUpdateType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "data_update" => Ok(Self::DataUpdate),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for DataUpdateType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String> for DataUpdateType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String> for DataUpdateType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for DataUpdateType {
-    fn default() -> Self {
-        DataUpdateType::DataUpdate
-    }
 }
 ///This action allows to execute the inner actions behalf of the defined sender.
 ///
@@ -4238,80 +2127,6 @@ pub struct GasKeyInfo {
     pub balance: NearToken,
     pub num_nonces: u16,
 }
-///`GasKeyNonceUpdateChange`
-///
-#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
-pub struct GasKeyNonceUpdateChange {
-    pub account_id: AccountId,
-    pub index: u16,
-    pub nonce: u64,
-    pub public_key: PublicKey,
-}
-///`GasKeyNonceUpdateType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum GasKeyNonceUpdateType {
-    #[serde(rename = "gas_key_nonce_update")]
-    GasKeyNonceUpdate,
-}
-impl ::std::fmt::Display for GasKeyNonceUpdateType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::GasKeyNonceUpdate => f.write_str("gas_key_nonce_update"),
-        }
-    }
-}
-impl ::std::str::FromStr for GasKeyNonceUpdateType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "gas_key_nonce_update" => Ok(Self::GasKeyNonceUpdate),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for GasKeyNonceUpdateType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String> for GasKeyNonceUpdateType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String> for GasKeyNonceUpdateType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for GasKeyNonceUpdateType {
-    fn default() -> Self {
-        GasKeyNonceUpdateType::GasKeyNonceUpdate
-    }
-}
 ///Configuration for garbage collection.
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
@@ -4660,71 +2475,6 @@ on the curve).*/
 derived from bytes).*/
     Ed25519VerifyInvalidInput { msg: ::std::string::String },
 }
-///`InitialStateType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum InitialStateType {
-    #[serde(rename = "initial_state")]
-    InitialState,
-}
-impl ::std::fmt::Display for InitialStateType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::InitialState => f.write_str("initial_state"),
-        }
-    }
-}
-impl ::std::str::FromStr for InitialStateType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "initial_state" => Ok(Self::InitialState),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for InitialStateType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String> for InitialStateType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String> for InitialStateType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for InitialStateType {
-    fn default() -> Self {
-        InitialStateType::InitialState
-    }
-}
 ///`InvalidAccessKeyError`
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
@@ -5064,71 +2814,6 @@ impl ::std::convert::TryFrom<::std::string::String> for MethodResolveError {
         value.parse()
     }
 }
-///`MigrationType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum MigrationType {
-    #[serde(rename = "migration")]
-    Migration,
-}
-impl ::std::fmt::Display for MigrationType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::Migration => f.write_str("migration"),
-        }
-    }
-}
-impl ::std::str::FromStr for MigrationType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "migration" => Ok(Self::Migration),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for MigrationType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String> for MigrationType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String> for MigrationType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for MigrationType {
-    fn default() -> Self {
-        MigrationType::Migration
-    }
-}
 ///`MissingTrieValue`
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
@@ -5444,71 +3129,6 @@ impl ::std::convert::From<WithdrawFromGasKeyAction> for NonDelegateAction {
         Self::WithdrawFromGasKey(value)
     }
 }
-///`NotWritableToDiskType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum NotWritableToDiskType {
-    #[serde(rename = "not_writable_to_disk")]
-    NotWritableToDisk,
-}
-impl ::std::fmt::Display for NotWritableToDiskType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::NotWritableToDisk => f.write_str("not_writable_to_disk"),
-        }
-    }
-}
-impl ::std::str::FromStr for NotWritableToDiskType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "not_writable_to_disk" => Ok(Self::NotWritableToDisk),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for NotWritableToDiskType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String> for NotWritableToDiskType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String> for NotWritableToDiskType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for NotWritableToDiskType {
-    fn default() -> Self {
-        NotWritableToDiskType::NotWritableToDisk
-    }
-}
 ///Peer id is the public key.
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
@@ -5576,71 +3196,6 @@ pub struct PeerInfoView {
     pub received_bytes_per_sec: u64,
     pub sent_bytes_per_sec: u64,
     pub tracked_shards: ::std::vec::Vec<ShardId>,
-}
-///`PostponedReceiptType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum PostponedReceiptType {
-    #[serde(rename = "postponed_receipt")]
-    PostponedReceipt,
-}
-impl ::std::fmt::Display for PostponedReceiptType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::PostponedReceipt => f.write_str("postponed_receipt"),
-        }
-    }
-}
-impl ::std::str::FromStr for PostponedReceiptType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "postponed_receipt" => Ok(Self::PostponedReceipt),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for PostponedReceiptType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String> for PostponedReceiptType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String> for PostponedReceiptType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for PostponedReceiptType {
-    fn default() -> Self {
-        PostponedReceiptType::PostponedReceipt
-    }
 }
 ///Error that can occur while preparing or executing Wasm smart-contract.
 ///
@@ -5963,38 +3518,6 @@ impl<'de> ::serde::Deserialize<'de> for QueryRequest {
             .and_then(|v| v.as_str())
             .ok_or_else(|| ::serde::de::Error::missing_field("request_type"))?;
         match request_type {
-            "view_gas_key_nonces" => {
-                let account_id = map
-                    .get("account_id")
-                    .cloned()
-                    .ok_or_else(|| ::serde::de::Error::missing_field("account_id"))
-                    .and_then(|v| {
-                        serde_json::from_value(v).map_err(::serde::de::Error::custom)
-                    })?;
-                let public_key = map
-                    .get("public_key")
-                    .cloned()
-                    .ok_or_else(|| ::serde::de::Error::missing_field("public_key"))
-                    .and_then(|v| {
-                        serde_json::from_value(v).map_err(::serde::de::Error::custom)
-                    })?;
-                Ok(QueryRequest::ViewGasKeyNonces {
-                    account_id,
-                    public_key,
-                })
-            }
-            "view_code" => {
-                let account_id = map
-                    .get("account_id")
-                    .cloned()
-                    .ok_or_else(|| ::serde::de::Error::missing_field("account_id"))
-                    .and_then(|v| {
-                        serde_json::from_value(v).map_err(::serde::de::Error::custom)
-                    })?;
-                Ok(QueryRequest::ViewCode {
-                    account_id,
-                })
-            }
             "call_function" => {
                 let account_id = map
                     .get("account_id")
@@ -6023,6 +3546,26 @@ impl<'de> ::serde::Deserialize<'de> for QueryRequest {
                     method_name,
                 })
             }
+            "view_access_key" => {
+                let account_id = map
+                    .get("account_id")
+                    .cloned()
+                    .ok_or_else(|| ::serde::de::Error::missing_field("account_id"))
+                    .and_then(|v| {
+                        serde_json::from_value(v).map_err(::serde::de::Error::custom)
+                    })?;
+                let public_key = map
+                    .get("public_key")
+                    .cloned()
+                    .ok_or_else(|| ::serde::de::Error::missing_field("public_key"))
+                    .and_then(|v| {
+                        serde_json::from_value(v).map_err(::serde::de::Error::custom)
+                    })?;
+                Ok(QueryRequest::ViewAccessKey {
+                    account_id,
+                    public_key,
+                })
+            }
             "view_access_key_list" => {
                 let account_id = map
                     .get("account_id")
@@ -6033,6 +3576,62 @@ impl<'de> ::serde::Deserialize<'de> for QueryRequest {
                     })?;
                 Ok(QueryRequest::ViewAccessKeyList {
                     account_id,
+                })
+            }
+            "view_account" => {
+                let account_id = map
+                    .get("account_id")
+                    .cloned()
+                    .ok_or_else(|| ::serde::de::Error::missing_field("account_id"))
+                    .and_then(|v| {
+                        serde_json::from_value(v).map_err(::serde::de::Error::custom)
+                    })?;
+                Ok(QueryRequest::ViewAccount {
+                    account_id,
+                })
+            }
+            "view_code" => {
+                let account_id = map
+                    .get("account_id")
+                    .cloned()
+                    .ok_or_else(|| ::serde::de::Error::missing_field("account_id"))
+                    .and_then(|v| {
+                        serde_json::from_value(v).map_err(::serde::de::Error::custom)
+                    })?;
+                Ok(QueryRequest::ViewCode {
+                    account_id,
+                })
+            }
+            "view_gas_key_nonces" => {
+                let account_id = map
+                    .get("account_id")
+                    .cloned()
+                    .ok_or_else(|| ::serde::de::Error::missing_field("account_id"))
+                    .and_then(|v| {
+                        serde_json::from_value(v).map_err(::serde::de::Error::custom)
+                    })?;
+                let public_key = map
+                    .get("public_key")
+                    .cloned()
+                    .ok_or_else(|| ::serde::de::Error::missing_field("public_key"))
+                    .and_then(|v| {
+                        serde_json::from_value(v).map_err(::serde::de::Error::custom)
+                    })?;
+                Ok(QueryRequest::ViewGasKeyNonces {
+                    account_id,
+                    public_key,
+                })
+            }
+            "view_global_contract_code" => {
+                let code_hash = map
+                    .get("code_hash")
+                    .cloned()
+                    .ok_or_else(|| ::serde::de::Error::missing_field("code_hash"))
+                    .and_then(|v| {
+                        serde_json::from_value(v).map_err(::serde::de::Error::custom)
+                    })?;
+                Ok(QueryRequest::ViewGlobalContractCode {
+                    code_hash,
                 })
             }
             "view_global_contract_code_by_account_id" => {
@@ -6074,64 +3673,20 @@ impl<'de> ::serde::Deserialize<'de> for QueryRequest {
                     prefix_base64,
                 })
             }
-            "view_account" => {
-                let account_id = map
-                    .get("account_id")
-                    .cloned()
-                    .ok_or_else(|| ::serde::de::Error::missing_field("account_id"))
-                    .and_then(|v| {
-                        serde_json::from_value(v).map_err(::serde::de::Error::custom)
-                    })?;
-                Ok(QueryRequest::ViewAccount {
-                    account_id,
-                })
-            }
-            "view_access_key" => {
-                let account_id = map
-                    .get("account_id")
-                    .cloned()
-                    .ok_or_else(|| ::serde::de::Error::missing_field("account_id"))
-                    .and_then(|v| {
-                        serde_json::from_value(v).map_err(::serde::de::Error::custom)
-                    })?;
-                let public_key = map
-                    .get("public_key")
-                    .cloned()
-                    .ok_or_else(|| ::serde::de::Error::missing_field("public_key"))
-                    .and_then(|v| {
-                        serde_json::from_value(v).map_err(::serde::de::Error::custom)
-                    })?;
-                Ok(QueryRequest::ViewAccessKey {
-                    account_id,
-                    public_key,
-                })
-            }
-            "view_global_contract_code" => {
-                let code_hash = map
-                    .get("code_hash")
-                    .cloned()
-                    .ok_or_else(|| ::serde::de::Error::missing_field("code_hash"))
-                    .and_then(|v| {
-                        serde_json::from_value(v).map_err(::serde::de::Error::custom)
-                    })?;
-                Ok(QueryRequest::ViewGlobalContractCode {
-                    code_hash,
-                })
-            }
             other => {
                 Err(
                     ::serde::de::Error::unknown_variant(
                         other,
                         &[
-                            "view_gas_key_nonces",
-                            "view_code",
                             "call_function",
+                            "view_access_key",
                             "view_access_key_list",
+                            "view_account",
+                            "view_code",
+                            "view_gas_key_nonces",
+                            "view_global_contract_code",
                             "view_global_contract_code_by_account_id",
                             "view_state",
-                            "view_account",
-                            "view_access_key",
-                            "view_global_contract_code",
                         ],
                     ),
                 )
@@ -6168,136 +3723,6 @@ pub enum ReceiptEnumView {
         id: GlobalContractIdentifier,
         target_shard: ShardId,
     },
-}
-///`ReceiptProcessingType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum ReceiptProcessingType {
-    #[serde(rename = "receipt_processing")]
-    ReceiptProcessing,
-}
-impl ::std::fmt::Display for ReceiptProcessingType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::ReceiptProcessing => f.write_str("receipt_processing"),
-        }
-    }
-}
-impl ::std::str::FromStr for ReceiptProcessingType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "receipt_processing" => Ok(Self::ReceiptProcessing),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for ReceiptProcessingType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String> for ReceiptProcessingType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String> for ReceiptProcessingType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for ReceiptProcessingType {
-    fn default() -> Self {
-        ReceiptProcessingType::ReceiptProcessing
-    }
-}
-///`ReceiptType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum ReceiptType {
-    #[serde(rename = "receipt")]
-    Receipt,
-}
-impl ::std::fmt::Display for ReceiptType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::Receipt => f.write_str("receipt"),
-        }
-    }
-}
-impl ::std::str::FromStr for ReceiptType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "receipt" => Ok(Self::Receipt),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for ReceiptType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String> for ReceiptType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String> for ReceiptType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for ReceiptType {
-    fn default() -> Self {
-        ReceiptType::Receipt
-    }
 }
 ///Describes the error for validating a receipt.
 ///
@@ -6707,27 +4132,21 @@ pub struct RpcLightClientBlockProofResponse {
 ///`RpcLightClientExecutionProofRequest`
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
-#[serde(untagged)]
+#[serde(tag = "type")]
 pub enum RpcLightClientExecutionProofRequest {
+    ///Transaction
+    #[serde(rename = "transaction")]
     Transaction {
         light_client_head: CryptoHash,
         sender_id: AccountId,
         transaction_hash: CryptoHash,
-        #[serde(
-            rename = "type",
-            default = "defaults::rpc_light_client_execution_proof_request_transaction_type"
-        )]
-        type_: TransactionType,
     },
+    ///Receipt
+    #[serde(rename = "receipt")]
     Receipt {
         light_client_head: CryptoHash,
         receipt_id: CryptoHash,
         receiver_id: AccountId,
-        #[serde(
-            rename = "type",
-            default = "defaults::rpc_light_client_execution_proof_request_receipt_type"
-        )]
-        type_: ReceiptType,
     },
 }
 ///`RpcLightClientExecutionProofResponse`
@@ -7351,130 +4770,6 @@ impl<'de> ::serde::Deserialize<'de> for RpcQueryRequest {
             .and_then(|v| v.as_str())
             .ok_or_else(|| ::serde::de::Error::missing_field("request_type"))?;
         match request_type {
-            "view_global_contract_code" => {
-                if map.contains_key("block_id") {
-                    let block_id = map
-                        .get("block_id")
-                        .cloned()
-                        .ok_or_else(|| ::serde::de::Error::missing_field("block_id"))
-                        .and_then(|v| {
-                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
-                        })?;
-                    let code_hash = map
-                        .get("code_hash")
-                        .cloned()
-                        .ok_or_else(|| ::serde::de::Error::missing_field("code_hash"))
-                        .and_then(|v| {
-                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
-                        })?;
-                    Ok(RpcQueryRequest::ViewGlobalContractCodeBlockId {
-                        block_id,
-                        code_hash,
-                    })
-                } else if map.contains_key("finality") {
-                    let code_hash = map
-                        .get("code_hash")
-                        .cloned()
-                        .ok_or_else(|| ::serde::de::Error::missing_field("code_hash"))
-                        .and_then(|v| {
-                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
-                        })?;
-                    let finality = map
-                        .get("finality")
-                        .cloned()
-                        .ok_or_else(|| ::serde::de::Error::missing_field("finality"))
-                        .and_then(|v| {
-                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
-                        })?;
-                    Ok(RpcQueryRequest::ViewGlobalContractCodeFinality {
-                        code_hash,
-                        finality,
-                    })
-                } else {
-                    let code_hash = map
-                        .get("code_hash")
-                        .cloned()
-                        .ok_or_else(|| ::serde::de::Error::missing_field("code_hash"))
-                        .and_then(|v| {
-                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
-                        })?;
-                    let sync_checkpoint = map
-                        .get("sync_checkpoint")
-                        .cloned()
-                        .ok_or_else(|| ::serde::de::Error::missing_field(
-                            "sync_checkpoint",
-                        ))
-                        .and_then(|v| {
-                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
-                        })?;
-                    Ok(RpcQueryRequest::ViewGlobalContractCodeSyncCheckpoint {
-                        code_hash,
-                        sync_checkpoint,
-                    })
-                }
-            }
-            "view_account" => {
-                if map.contains_key("block_id") {
-                    let account_id = map
-                        .get("account_id")
-                        .cloned()
-                        .ok_or_else(|| ::serde::de::Error::missing_field("account_id"))
-                        .and_then(|v| {
-                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
-                        })?;
-                    let block_id = map
-                        .get("block_id")
-                        .cloned()
-                        .ok_or_else(|| ::serde::de::Error::missing_field("block_id"))
-                        .and_then(|v| {
-                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
-                        })?;
-                    Ok(RpcQueryRequest::ViewAccountBlockId {
-                        account_id,
-                        block_id,
-                    })
-                } else if map.contains_key("finality") {
-                    let account_id = map
-                        .get("account_id")
-                        .cloned()
-                        .ok_or_else(|| ::serde::de::Error::missing_field("account_id"))
-                        .and_then(|v| {
-                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
-                        })?;
-                    let finality = map
-                        .get("finality")
-                        .cloned()
-                        .ok_or_else(|| ::serde::de::Error::missing_field("finality"))
-                        .and_then(|v| {
-                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
-                        })?;
-                    Ok(RpcQueryRequest::ViewAccountFinality {
-                        account_id,
-                        finality,
-                    })
-                } else {
-                    let account_id = map
-                        .get("account_id")
-                        .cloned()
-                        .ok_or_else(|| ::serde::de::Error::missing_field("account_id"))
-                        .and_then(|v| {
-                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
-                        })?;
-                    let sync_checkpoint = map
-                        .get("sync_checkpoint")
-                        .cloned()
-                        .ok_or_else(|| ::serde::de::Error::missing_field(
-                            "sync_checkpoint",
-                        ))
-                        .and_then(|v| {
-                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
-                        })?;
-                    Ok(RpcQueryRequest::ViewAccountSyncCheckpoint {
-                        account_id,
-                        sync_checkpoint,
-                    })
-                }
-            }
             "call_function" => {
                 if map.contains_key("block_id") {
                     let account_id = map
@@ -7585,6 +4880,92 @@ impl<'de> ::serde::Deserialize<'de> for RpcQueryRequest {
                     })
                 }
             }
+            "view_access_key" => {
+                if map.contains_key("block_id") {
+                    let account_id = map
+                        .get("account_id")
+                        .cloned()
+                        .ok_or_else(|| ::serde::de::Error::missing_field("account_id"))
+                        .and_then(|v| {
+                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
+                        })?;
+                    let block_id = map
+                        .get("block_id")
+                        .cloned()
+                        .ok_or_else(|| ::serde::de::Error::missing_field("block_id"))
+                        .and_then(|v| {
+                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
+                        })?;
+                    let public_key = map
+                        .get("public_key")
+                        .cloned()
+                        .ok_or_else(|| ::serde::de::Error::missing_field("public_key"))
+                        .and_then(|v| {
+                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
+                        })?;
+                    Ok(RpcQueryRequest::ViewAccessKeyBlockId {
+                        account_id,
+                        block_id,
+                        public_key,
+                    })
+                } else if map.contains_key("finality") {
+                    let account_id = map
+                        .get("account_id")
+                        .cloned()
+                        .ok_or_else(|| ::serde::de::Error::missing_field("account_id"))
+                        .and_then(|v| {
+                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
+                        })?;
+                    let finality = map
+                        .get("finality")
+                        .cloned()
+                        .ok_or_else(|| ::serde::de::Error::missing_field("finality"))
+                        .and_then(|v| {
+                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
+                        })?;
+                    let public_key = map
+                        .get("public_key")
+                        .cloned()
+                        .ok_or_else(|| ::serde::de::Error::missing_field("public_key"))
+                        .and_then(|v| {
+                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
+                        })?;
+                    Ok(RpcQueryRequest::ViewAccessKeyFinality {
+                        account_id,
+                        finality,
+                        public_key,
+                    })
+                } else {
+                    let account_id = map
+                        .get("account_id")
+                        .cloned()
+                        .ok_or_else(|| ::serde::de::Error::missing_field("account_id"))
+                        .and_then(|v| {
+                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
+                        })?;
+                    let public_key = map
+                        .get("public_key")
+                        .cloned()
+                        .ok_or_else(|| ::serde::de::Error::missing_field("public_key"))
+                        .and_then(|v| {
+                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
+                        })?;
+                    let sync_checkpoint = map
+                        .get("sync_checkpoint")
+                        .cloned()
+                        .ok_or_else(|| ::serde::de::Error::missing_field(
+                            "sync_checkpoint",
+                        ))
+                        .and_then(|v| {
+                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
+                        })?;
+                    Ok(RpcQueryRequest::ViewAccessKeySyncCheckpoint {
+                        account_id,
+                        public_key,
+                        sync_checkpoint,
+                    })
+                }
+            }
             "view_access_key_list" => {
                 if map.contains_key("block_id") {
                     let account_id = map
@@ -7642,6 +5023,68 @@ impl<'de> ::serde::Deserialize<'de> for RpcQueryRequest {
                             serde_json::from_value(v).map_err(::serde::de::Error::custom)
                         })?;
                     Ok(RpcQueryRequest::ViewAccessKeyListSyncCheckpoint {
+                        account_id,
+                        sync_checkpoint,
+                    })
+                }
+            }
+            "view_account" => {
+                if map.contains_key("block_id") {
+                    let account_id = map
+                        .get("account_id")
+                        .cloned()
+                        .ok_or_else(|| ::serde::de::Error::missing_field("account_id"))
+                        .and_then(|v| {
+                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
+                        })?;
+                    let block_id = map
+                        .get("block_id")
+                        .cloned()
+                        .ok_or_else(|| ::serde::de::Error::missing_field("block_id"))
+                        .and_then(|v| {
+                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
+                        })?;
+                    Ok(RpcQueryRequest::ViewAccountBlockId {
+                        account_id,
+                        block_id,
+                    })
+                } else if map.contains_key("finality") {
+                    let account_id = map
+                        .get("account_id")
+                        .cloned()
+                        .ok_or_else(|| ::serde::de::Error::missing_field("account_id"))
+                        .and_then(|v| {
+                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
+                        })?;
+                    let finality = map
+                        .get("finality")
+                        .cloned()
+                        .ok_or_else(|| ::serde::de::Error::missing_field("finality"))
+                        .and_then(|v| {
+                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
+                        })?;
+                    Ok(RpcQueryRequest::ViewAccountFinality {
+                        account_id,
+                        finality,
+                    })
+                } else {
+                    let account_id = map
+                        .get("account_id")
+                        .cloned()
+                        .ok_or_else(|| ::serde::de::Error::missing_field("account_id"))
+                        .and_then(|v| {
+                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
+                        })?;
+                    let sync_checkpoint = map
+                        .get("sync_checkpoint")
+                        .cloned()
+                        .ok_or_else(|| ::serde::de::Error::missing_field(
+                            "sync_checkpoint",
+                        ))
+                        .and_then(|v| {
+                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
+                        })?;
+                    Ok(RpcQueryRequest::ViewAccountSyncCheckpoint {
                         account_id,
                         sync_checkpoint,
                     })
@@ -7795,7 +5238,69 @@ impl<'de> ::serde::Deserialize<'de> for RpcQueryRequest {
                     })
                 }
             }
-            "view_access_key" => {
+            "view_global_contract_code" => {
+                if map.contains_key("block_id") {
+                    let block_id = map
+                        .get("block_id")
+                        .cloned()
+                        .ok_or_else(|| ::serde::de::Error::missing_field("block_id"))
+                        .and_then(|v| {
+                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
+                        })?;
+                    let code_hash = map
+                        .get("code_hash")
+                        .cloned()
+                        .ok_or_else(|| ::serde::de::Error::missing_field("code_hash"))
+                        .and_then(|v| {
+                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
+                        })?;
+                    Ok(RpcQueryRequest::ViewGlobalContractCodeBlockId {
+                        block_id,
+                        code_hash,
+                    })
+                } else if map.contains_key("finality") {
+                    let code_hash = map
+                        .get("code_hash")
+                        .cloned()
+                        .ok_or_else(|| ::serde::de::Error::missing_field("code_hash"))
+                        .and_then(|v| {
+                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
+                        })?;
+                    let finality = map
+                        .get("finality")
+                        .cloned()
+                        .ok_or_else(|| ::serde::de::Error::missing_field("finality"))
+                        .and_then(|v| {
+                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
+                        })?;
+                    Ok(RpcQueryRequest::ViewGlobalContractCodeFinality {
+                        code_hash,
+                        finality,
+                    })
+                } else {
+                    let code_hash = map
+                        .get("code_hash")
+                        .cloned()
+                        .ok_or_else(|| ::serde::de::Error::missing_field("code_hash"))
+                        .and_then(|v| {
+                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
+                        })?;
+                    let sync_checkpoint = map
+                        .get("sync_checkpoint")
+                        .cloned()
+                        .ok_or_else(|| ::serde::de::Error::missing_field(
+                            "sync_checkpoint",
+                        ))
+                        .and_then(|v| {
+                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
+                        })?;
+                    Ok(RpcQueryRequest::ViewGlobalContractCodeSyncCheckpoint {
+                        code_hash,
+                        sync_checkpoint,
+                    })
+                }
+            }
+            "view_global_contract_code_by_account_id" => {
                 if map.contains_key("block_id") {
                     let account_id = map
                         .get("account_id")
@@ -7811,17 +5316,9 @@ impl<'de> ::serde::Deserialize<'de> for RpcQueryRequest {
                         .and_then(|v| {
                             serde_json::from_value(v).map_err(::serde::de::Error::custom)
                         })?;
-                    let public_key = map
-                        .get("public_key")
-                        .cloned()
-                        .ok_or_else(|| ::serde::de::Error::missing_field("public_key"))
-                        .and_then(|v| {
-                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
-                        })?;
-                    Ok(RpcQueryRequest::ViewAccessKeyBlockId {
+                    Ok(RpcQueryRequest::ViewGlobalContractCodeByAccountIdBlockId {
                         account_id,
                         block_id,
-                        public_key,
                     })
                 } else if map.contains_key("finality") {
                     let account_id = map
@@ -7838,30 +5335,15 @@ impl<'de> ::serde::Deserialize<'de> for RpcQueryRequest {
                         .and_then(|v| {
                             serde_json::from_value(v).map_err(::serde::de::Error::custom)
                         })?;
-                    let public_key = map
-                        .get("public_key")
-                        .cloned()
-                        .ok_or_else(|| ::serde::de::Error::missing_field("public_key"))
-                        .and_then(|v| {
-                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
-                        })?;
-                    Ok(RpcQueryRequest::ViewAccessKeyFinality {
+                    Ok(RpcQueryRequest::ViewGlobalContractCodeByAccountIdFinality {
                         account_id,
                         finality,
-                        public_key,
                     })
                 } else {
                     let account_id = map
                         .get("account_id")
                         .cloned()
                         .ok_or_else(|| ::serde::de::Error::missing_field("account_id"))
-                        .and_then(|v| {
-                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
-                        })?;
-                    let public_key = map
-                        .get("public_key")
-                        .cloned()
-                        .ok_or_else(|| ::serde::de::Error::missing_field("public_key"))
                         .and_then(|v| {
                             serde_json::from_value(v).map_err(::serde::de::Error::custom)
                         })?;
@@ -7874,9 +5356,8 @@ impl<'de> ::serde::Deserialize<'de> for RpcQueryRequest {
                         .and_then(|v| {
                             serde_json::from_value(v).map_err(::serde::de::Error::custom)
                         })?;
-                    Ok(RpcQueryRequest::ViewAccessKeySyncCheckpoint {
+                    Ok(RpcQueryRequest::ViewGlobalContractCodeByAccountIdSyncCheckpoint {
                         account_id,
-                        public_key,
                         sync_checkpoint,
                     })
                 }
@@ -7994,82 +5475,20 @@ impl<'de> ::serde::Deserialize<'de> for RpcQueryRequest {
                     })
                 }
             }
-            "view_global_contract_code_by_account_id" => {
-                if map.contains_key("block_id") {
-                    let account_id = map
-                        .get("account_id")
-                        .cloned()
-                        .ok_or_else(|| ::serde::de::Error::missing_field("account_id"))
-                        .and_then(|v| {
-                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
-                        })?;
-                    let block_id = map
-                        .get("block_id")
-                        .cloned()
-                        .ok_or_else(|| ::serde::de::Error::missing_field("block_id"))
-                        .and_then(|v| {
-                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
-                        })?;
-                    Ok(RpcQueryRequest::ViewGlobalContractCodeByAccountIdBlockId {
-                        account_id,
-                        block_id,
-                    })
-                } else if map.contains_key("finality") {
-                    let account_id = map
-                        .get("account_id")
-                        .cloned()
-                        .ok_or_else(|| ::serde::de::Error::missing_field("account_id"))
-                        .and_then(|v| {
-                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
-                        })?;
-                    let finality = map
-                        .get("finality")
-                        .cloned()
-                        .ok_or_else(|| ::serde::de::Error::missing_field("finality"))
-                        .and_then(|v| {
-                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
-                        })?;
-                    Ok(RpcQueryRequest::ViewGlobalContractCodeByAccountIdFinality {
-                        account_id,
-                        finality,
-                    })
-                } else {
-                    let account_id = map
-                        .get("account_id")
-                        .cloned()
-                        .ok_or_else(|| ::serde::de::Error::missing_field("account_id"))
-                        .and_then(|v| {
-                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
-                        })?;
-                    let sync_checkpoint = map
-                        .get("sync_checkpoint")
-                        .cloned()
-                        .ok_or_else(|| ::serde::de::Error::missing_field(
-                            "sync_checkpoint",
-                        ))
-                        .and_then(|v| {
-                            serde_json::from_value(v).map_err(::serde::de::Error::custom)
-                        })?;
-                    Ok(RpcQueryRequest::ViewGlobalContractCodeByAccountIdSyncCheckpoint {
-                        account_id,
-                        sync_checkpoint,
-                    })
-                }
-            }
             other => {
                 Err(
                     ::serde::de::Error::unknown_variant(
                         other,
                         &[
-                            "view_global_contract_code",
-                            "view_account",
                             "call_function",
+                            "view_access_key",
                             "view_access_key_list",
+                            "view_account",
                             "view_code",
                             "view_gas_key_nonces",
-                            "view_access_key",
-                            "view_state",
+                            "view_global_contract_code",
                             "view_global_contract_code_by_account_id",
+                            "view_state",
                         ],
                     ),
                 )
@@ -8234,123 +5653,78 @@ pub enum RpcStateChangesInBlockByTypeRequest {
     AccountChangesBlockId {
         account_ids: ::std::vec::Vec<AccountId>,
         block_id: BlockId,
-        #[serde(
-            default = "defaults::rpc_state_changes_in_block_by_type_request_account_changes_block_id_changes_type"
-        )]
-        changes_type: AccountChangesBlockIdChangesType,
+        changes_type: ::std::string::String,
     },
     SingleAccessKeyChangesBlockId {
         block_id: BlockId,
-        #[serde(
-            default = "defaults::rpc_state_changes_in_block_by_type_request_single_access_key_changes_block_id_changes_type"
-        )]
-        changes_type: SingleAccessKeyChangesBlockIdChangesType,
+        changes_type: ::std::string::String,
         keys: ::std::vec::Vec<AccountWithPublicKey>,
     },
     AllAccessKeyChangesBlockId {
         account_ids: ::std::vec::Vec<AccountId>,
         block_id: BlockId,
-        #[serde(
-            default = "defaults::rpc_state_changes_in_block_by_type_request_all_access_key_changes_block_id_changes_type"
-        )]
-        changes_type: AllAccessKeyChangesBlockIdChangesType,
+        changes_type: ::std::string::String,
     },
     ContractCodeChangesBlockId {
         account_ids: ::std::vec::Vec<AccountId>,
         block_id: BlockId,
-        #[serde(
-            default = "defaults::rpc_state_changes_in_block_by_type_request_contract_code_changes_block_id_changes_type"
-        )]
-        changes_type: ContractCodeChangesBlockIdChangesType,
+        changes_type: ::std::string::String,
     },
     DataChangesBlockId {
         account_ids: ::std::vec::Vec<AccountId>,
         block_id: BlockId,
-        #[serde(
-            default = "defaults::rpc_state_changes_in_block_by_type_request_data_changes_block_id_changes_type"
-        )]
-        changes_type: DataChangesBlockIdChangesType,
+        changes_type: ::std::string::String,
         key_prefix_base64: StoreKey,
     },
     AccountChangesFinality {
         account_ids: ::std::vec::Vec<AccountId>,
-        #[serde(
-            default = "defaults::rpc_state_changes_in_block_by_type_request_account_changes_finality_changes_type"
-        )]
-        changes_type: AccountChangesFinalityChangesType,
+        changes_type: ::std::string::String,
         finality: Finality,
     },
     SingleAccessKeyChangesFinality {
-        #[serde(
-            default = "defaults::rpc_state_changes_in_block_by_type_request_single_access_key_changes_finality_changes_type"
-        )]
-        changes_type: SingleAccessKeyChangesFinalityChangesType,
+        changes_type: ::std::string::String,
         finality: Finality,
         keys: ::std::vec::Vec<AccountWithPublicKey>,
     },
     AllAccessKeyChangesFinality {
         account_ids: ::std::vec::Vec<AccountId>,
-        #[serde(
-            default = "defaults::rpc_state_changes_in_block_by_type_request_all_access_key_changes_finality_changes_type"
-        )]
-        changes_type: AllAccessKeyChangesFinalityChangesType,
+        changes_type: ::std::string::String,
         finality: Finality,
     },
     ContractCodeChangesFinality {
         account_ids: ::std::vec::Vec<AccountId>,
-        #[serde(
-            default = "defaults::rpc_state_changes_in_block_by_type_request_contract_code_changes_finality_changes_type"
-        )]
-        changes_type: ContractCodeChangesFinalityChangesType,
+        changes_type: ::std::string::String,
         finality: Finality,
     },
     DataChangesFinality {
         account_ids: ::std::vec::Vec<AccountId>,
-        #[serde(
-            default = "defaults::rpc_state_changes_in_block_by_type_request_data_changes_finality_changes_type"
-        )]
-        changes_type: DataChangesFinalityChangesType,
+        changes_type: ::std::string::String,
         finality: Finality,
         key_prefix_base64: StoreKey,
     },
     AccountChangesSyncCheckpoint {
         account_ids: ::std::vec::Vec<AccountId>,
-        #[serde(
-            default = "defaults::rpc_state_changes_in_block_by_type_request_account_changes_sync_checkpoint_changes_type"
-        )]
-        changes_type: AccountChangesSyncCheckpointChangesType,
+        changes_type: ::std::string::String,
         sync_checkpoint: SyncCheckpoint,
     },
     SingleAccessKeyChangesSyncCheckpoint {
-        #[serde(
-            default = "defaults::rpc_state_changes_in_block_by_type_request_single_access_key_changes_sync_checkpoint_changes_type"
-        )]
-        changes_type: SingleAccessKeyChangesSyncCheckpointChangesType,
+        changes_type: ::std::string::String,
         keys: ::std::vec::Vec<AccountWithPublicKey>,
         sync_checkpoint: SyncCheckpoint,
     },
     AllAccessKeyChangesSyncCheckpoint {
         account_ids: ::std::vec::Vec<AccountId>,
-        #[serde(
-            default = "defaults::rpc_state_changes_in_block_by_type_request_all_access_key_changes_sync_checkpoint_changes_type"
-        )]
-        changes_type: AllAccessKeyChangesSyncCheckpointChangesType,
+        changes_type: ::std::string::String,
         sync_checkpoint: SyncCheckpoint,
     },
     ContractCodeChangesSyncCheckpoint {
         account_ids: ::std::vec::Vec<AccountId>,
-        #[serde(
-            default = "defaults::rpc_state_changes_in_block_by_type_request_contract_code_changes_sync_checkpoint_changes_type"
-        )]
-        changes_type: ContractCodeChangesSyncCheckpointChangesType,
+        changes_type: ::std::string::String,
         sync_checkpoint: SyncCheckpoint,
     },
     DataChangesSyncCheckpoint {
         account_ids: ::std::vec::Vec<AccountId>,
-        #[serde(
-            default = "defaults::rpc_state_changes_in_block_by_type_request_data_changes_sync_checkpoint_changes_type"
-        )]
-        changes_type: DataChangesSyncCheckpointChangesType,
+        changes_type: ::std::string::String,
         key_prefix_base64: StoreKey,
         sync_checkpoint: SyncCheckpoint,
     },
@@ -8894,274 +6268,6 @@ pub struct SignedTransactionView {
     pub signature: Signature,
     pub signer_id: AccountId,
 }
-///`SingleAccessKeyChangesBlockIdChangesType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum SingleAccessKeyChangesBlockIdChangesType {
-    #[serde(rename = "single_access_key_changes")]
-    SingleAccessKeyChanges,
-}
-impl ::std::fmt::Display for SingleAccessKeyChangesBlockIdChangesType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::SingleAccessKeyChanges => f.write_str("single_access_key_changes"),
-        }
-    }
-}
-impl ::std::str::FromStr for SingleAccessKeyChangesBlockIdChangesType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "single_access_key_changes" => Ok(Self::SingleAccessKeyChanges),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for SingleAccessKeyChangesBlockIdChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String>
-for SingleAccessKeyChangesBlockIdChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String>
-for SingleAccessKeyChangesBlockIdChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for SingleAccessKeyChangesBlockIdChangesType {
-    fn default() -> Self {
-        SingleAccessKeyChangesBlockIdChangesType::SingleAccessKeyChanges
-    }
-}
-///`SingleAccessKeyChangesChangesType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum SingleAccessKeyChangesChangesType {
-    #[serde(rename = "single_access_key_changes")]
-    SingleAccessKeyChanges,
-}
-impl ::std::fmt::Display for SingleAccessKeyChangesChangesType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::SingleAccessKeyChanges => f.write_str("single_access_key_changes"),
-        }
-    }
-}
-impl ::std::str::FromStr for SingleAccessKeyChangesChangesType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "single_access_key_changes" => Ok(Self::SingleAccessKeyChanges),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for SingleAccessKeyChangesChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String>
-for SingleAccessKeyChangesChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String>
-for SingleAccessKeyChangesChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for SingleAccessKeyChangesChangesType {
-    fn default() -> Self {
-        SingleAccessKeyChangesChangesType::SingleAccessKeyChanges
-    }
-}
-///`SingleAccessKeyChangesFinalityChangesType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum SingleAccessKeyChangesFinalityChangesType {
-    #[serde(rename = "single_access_key_changes")]
-    SingleAccessKeyChanges,
-}
-impl ::std::fmt::Display for SingleAccessKeyChangesFinalityChangesType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::SingleAccessKeyChanges => f.write_str("single_access_key_changes"),
-        }
-    }
-}
-impl ::std::str::FromStr for SingleAccessKeyChangesFinalityChangesType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "single_access_key_changes" => Ok(Self::SingleAccessKeyChanges),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for SingleAccessKeyChangesFinalityChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String>
-for SingleAccessKeyChangesFinalityChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String>
-for SingleAccessKeyChangesFinalityChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for SingleAccessKeyChangesFinalityChangesType {
-    fn default() -> Self {
-        SingleAccessKeyChangesFinalityChangesType::SingleAccessKeyChanges
-    }
-}
-///`SingleAccessKeyChangesSyncCheckpointChangesType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum SingleAccessKeyChangesSyncCheckpointChangesType {
-    #[serde(rename = "single_access_key_changes")]
-    SingleAccessKeyChanges,
-}
-impl ::std::fmt::Display for SingleAccessKeyChangesSyncCheckpointChangesType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::SingleAccessKeyChanges => f.write_str("single_access_key_changes"),
-        }
-    }
-}
-impl ::std::str::FromStr for SingleAccessKeyChangesSyncCheckpointChangesType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "single_access_key_changes" => Ok(Self::SingleAccessKeyChanges),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for SingleAccessKeyChangesSyncCheckpointChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String>
-for SingleAccessKeyChangesSyncCheckpointChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String>
-for SingleAccessKeyChangesSyncCheckpointChangesType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for SingleAccessKeyChangesSyncCheckpointChangesType {
-    fn default() -> Self {
-        SingleAccessKeyChangesSyncCheckpointChangesType::SingleAccessKeyChanges
-    }
-}
 ///`SlashedValidator`
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
@@ -9181,90 +6287,35 @@ pub struct StakeAction {
 ///See crate::types::StateChangeCause for details.
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
-#[serde(untagged)]
+#[serde(tag = "type")]
 pub enum StateChangeCauseView {
-    NotWritableToDisk {
-        #[serde(
-            rename = "type",
-            default = "defaults::state_change_cause_view_not_writable_to_disk_type"
-        )]
-        type_: NotWritableToDiskType,
-    },
-    InitialState {
-        #[serde(
-            rename = "type",
-            default = "defaults::state_change_cause_view_initial_state_type"
-        )]
-        type_: InitialStateType,
-    },
-    TransactionProcessing {
-        tx_hash: CryptoHash,
-        #[serde(
-            rename = "type",
-            default = "defaults::state_change_cause_view_transaction_processing_type"
-        )]
-        type_: TransactionProcessingType,
-    },
-    ActionReceiptProcessingStarted {
-        receipt_hash: CryptoHash,
-        #[serde(
-            rename = "type",
-            default = "defaults::state_change_cause_view_action_receipt_processing_started_type"
-        )]
-        type_: ActionReceiptProcessingStartedType,
-    },
-    ActionReceiptGasReward {
-        receipt_hash: CryptoHash,
-        #[serde(
-            rename = "type",
-            default = "defaults::state_change_cause_view_action_receipt_gas_reward_type"
-        )]
-        type_: ActionReceiptGasRewardType,
-    },
-    ReceiptProcessing {
-        receipt_hash: CryptoHash,
-        #[serde(
-            rename = "type",
-            default = "defaults::state_change_cause_view_receipt_processing_type"
-        )]
-        type_: ReceiptProcessingType,
-    },
-    PostponedReceipt {
-        receipt_hash: CryptoHash,
-        #[serde(
-            rename = "type",
-            default = "defaults::state_change_cause_view_postponed_receipt_type"
-        )]
-        type_: PostponedReceiptType,
-    },
-    UpdatedDelayedReceipts {
-        #[serde(
-            rename = "type",
-            default = "defaults::state_change_cause_view_updated_delayed_receipts_type"
-        )]
-        type_: UpdatedDelayedReceiptsType,
-    },
-    ValidatorAccountsUpdate {
-        #[serde(
-            rename = "type",
-            default = "defaults::state_change_cause_view_validator_accounts_update_type"
-        )]
-        type_: ValidatorAccountsUpdateType,
-    },
-    Migration {
-        #[serde(
-            rename = "type",
-            default = "defaults::state_change_cause_view_migration_type"
-        )]
-        type_: MigrationType,
-    },
-    BandwidthSchedulerStateUpdate {
-        #[serde(
-            rename = "type",
-            default = "defaults::state_change_cause_view_bandwidth_scheduler_state_update_type"
-        )]
-        type_: BandwidthSchedulerStateUpdateType,
-    },
+    #[serde(rename = "not_writable_to_disk")]
+    NotWritableToDisk,
+    #[serde(rename = "initial_state")]
+    InitialState,
+    ///TransactionProcessing
+    #[serde(rename = "transaction_processing")]
+    TransactionProcessing { tx_hash: CryptoHash },
+    ///ActionReceiptProcessingStarted
+    #[serde(rename = "action_receipt_processing_started")]
+    ActionReceiptProcessingStarted { receipt_hash: CryptoHash },
+    ///ActionReceiptGasReward
+    #[serde(rename = "action_receipt_gas_reward")]
+    ActionReceiptGasReward { receipt_hash: CryptoHash },
+    ///ReceiptProcessing
+    #[serde(rename = "receipt_processing")]
+    ReceiptProcessing { receipt_hash: CryptoHash },
+    ///PostponedReceipt
+    #[serde(rename = "postponed_receipt")]
+    PostponedReceipt { receipt_hash: CryptoHash },
+    #[serde(rename = "updated_delayed_receipts")]
+    UpdatedDelayedReceipts,
+    #[serde(rename = "validator_accounts_update")]
+    ValidatorAccountsUpdate,
+    #[serde(rename = "migration")]
+    Migration,
+    #[serde(rename = "bandwidth_scheduler_state_update")]
+    BandwidthSchedulerStateUpdate,
 }
 /**It is a [serializable view] of [`StateChangeKind`].
 
@@ -9272,169 +6323,112 @@ pub enum StateChangeCauseView {
 [`StateChangeKind`]: ../types/struct.StateChangeKind.html*/
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
-#[serde(untagged)]
+#[serde(tag = "type", content = "account_id")]
 pub enum StateChangeKindView {
-    AccountTouched {
-        account_id: AccountId,
-        #[serde(
-            rename = "type",
-            default = "defaults::state_change_kind_view_account_touched_type"
-        )]
-        type_: AccountTouchedType,
-    },
-    AccessKeyTouched {
-        account_id: AccountId,
-        #[serde(
-            rename = "type",
-            default = "defaults::state_change_kind_view_access_key_touched_type"
-        )]
-        type_: AccessKeyTouchedType,
-    },
-    DataTouched {
-        account_id: AccountId,
-        #[serde(
-            rename = "type",
-            default = "defaults::state_change_kind_view_data_touched_type"
-        )]
-        type_: DataTouchedType,
-    },
-    ContractCodeTouched {
-        account_id: AccountId,
-        #[serde(
-            rename = "type",
-            default = "defaults::state_change_kind_view_contract_code_touched_type"
-        )]
-        type_: ContractCodeTouchedType,
-    },
+    ///AccountTouched
+    #[serde(rename = "account_touched")]
+    AccountTouched(AccountId),
+    ///AccessKeyTouched
+    #[serde(rename = "access_key_touched")]
+    AccessKeyTouched(AccountId),
+    ///DataTouched
+    #[serde(rename = "data_touched")]
+    DataTouched(AccountId),
+    ///ContractCodeTouched
+    #[serde(rename = "contract_code_touched")]
+    ContractCodeTouched(AccountId),
 }
 ///`StateChangeWithCauseView`
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
-#[serde(untagged)]
+#[serde(tag = "type")]
 pub enum StateChangeWithCauseView {
+    ///AccountUpdate
+    #[serde(rename = "account_update")]
     AccountUpdate {
         cause: StateChangeCauseView,
-        change: AccountUpdateChange,
-        #[serde(
-            rename = "type",
-            default = "defaults::state_change_with_cause_view_account_update_type"
-        )]
-        type_: AccountUpdateType,
+        change: StateChangeWithCauseViewChange,
     },
+    ///AccountDeletion
+    #[serde(rename = "account_deletion")]
     AccountDeletion {
         cause: StateChangeCauseView,
-        change: AccountDeletionChange,
-        #[serde(
-            rename = "type",
-            default = "defaults::state_change_with_cause_view_account_deletion_type"
-        )]
-        type_: AccountDeletionType,
+        change: StateChangeWithCauseViewChange,
     },
+    ///AccessKeyUpdate
+    #[serde(rename = "access_key_update")]
     AccessKeyUpdate {
         cause: StateChangeCauseView,
-        change: AccessKeyUpdateChange,
-        #[serde(
-            rename = "type",
-            default = "defaults::state_change_with_cause_view_access_key_update_type"
-        )]
-        type_: AccessKeyUpdateType,
+        change: StateChangeWithCauseViewChange,
     },
+    ///AccessKeyDeletion
+    #[serde(rename = "access_key_deletion")]
     AccessKeyDeletion {
         cause: StateChangeCauseView,
-        change: AccessKeyDeletionChange,
-        #[serde(
-            rename = "type",
-            default = "defaults::state_change_with_cause_view_access_key_deletion_type"
-        )]
-        type_: AccessKeyDeletionType,
+        change: StateChangeWithCauseViewChange,
     },
+    ///GasKeyNonceUpdate
+    #[serde(rename = "gas_key_nonce_update")]
     GasKeyNonceUpdate {
         cause: StateChangeCauseView,
-        change: GasKeyNonceUpdateChange,
-        #[serde(
-            rename = "type",
-            default = "defaults::state_change_with_cause_view_gas_key_nonce_update_type"
-        )]
-        type_: GasKeyNonceUpdateType,
+        change: StateChangeWithCauseViewChange,
     },
-    DataUpdate {
-        cause: StateChangeCauseView,
-        change: DataUpdateChange,
-        #[serde(
-            rename = "type",
-            default = "defaults::state_change_with_cause_view_data_update_type"
-        )]
-        type_: DataUpdateType,
-    },
-    DataDeletion {
-        cause: StateChangeCauseView,
-        change: DataDeletionChange,
-        #[serde(
-            rename = "type",
-            default = "defaults::state_change_with_cause_view_data_deletion_type"
-        )]
-        type_: DataDeletionType,
-    },
+    ///DataUpdate
+    #[serde(rename = "data_update")]
+    DataUpdate { cause: StateChangeCauseView, change: StateChangeWithCauseViewChange },
+    ///DataDeletion
+    #[serde(rename = "data_deletion")]
+    DataDeletion { cause: StateChangeCauseView, change: StateChangeWithCauseViewChange },
+    ///ContractCodeUpdate
+    #[serde(rename = "contract_code_update")]
     ContractCodeUpdate {
         cause: StateChangeCauseView,
-        change: ContractCodeUpdateChange,
-        #[serde(
-            rename = "type",
-            default = "defaults::state_change_with_cause_view_contract_code_update_type"
-        )]
-        type_: ContractCodeUpdateType,
+        change: StateChangeWithCauseViewChange,
     },
+    ///ContractCodeDeletion
+    #[serde(rename = "contract_code_deletion")]
     ContractCodeDeletion {
         cause: StateChangeCauseView,
-        change: ContractCodeDeletionChange,
-        #[serde(
-            rename = "type",
-            default = "defaults::state_change_with_cause_view_contract_code_deletion_type"
-        )]
-        type_: ContractCodeDeletionType,
+        change: StateChangeWithCauseViewChange,
     },
+}
+///A view of the account
+///
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+pub struct StateChangeWithCauseViewChange {
+    pub account_id: AccountId,
+    pub amount: NearToken,
+    pub code_hash: CryptoHash,
+    #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
+    pub global_contract_account_id: ::std::option::Option<AccountId>,
+    #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
+    pub global_contract_hash: ::std::option::Option<CryptoHash>,
+    pub locked: NearToken,
+    ///TODO(2271): deprecated.
+    #[serde(default)]
+    pub storage_paid_at: u64,
+    pub storage_usage: u64,
 }
 ///`StateChangesRequestView`
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
-#[serde(untagged)]
+#[serde(tag = "changes_type")]
 pub enum StateChangesRequestView {
-    AccountChanges {
-        account_ids: ::std::vec::Vec<AccountId>,
-        #[serde(
-            default = "defaults::state_changes_request_view_account_changes_changes_type"
-        )]
-        changes_type: AccountChangesChangesType,
-    },
-    SingleAccessKeyChanges {
-        #[serde(
-            default = "defaults::state_changes_request_view_single_access_key_changes_changes_type"
-        )]
-        changes_type: SingleAccessKeyChangesChangesType,
-        keys: ::std::vec::Vec<AccountWithPublicKey>,
-    },
-    AllAccessKeyChanges {
-        account_ids: ::std::vec::Vec<AccountId>,
-        #[serde(
-            default = "defaults::state_changes_request_view_all_access_key_changes_changes_type"
-        )]
-        changes_type: AllAccessKeyChangesChangesType,
-    },
-    ContractCodeChanges {
-        account_ids: ::std::vec::Vec<AccountId>,
-        #[serde(
-            default = "defaults::state_changes_request_view_contract_code_changes_changes_type"
-        )]
-        changes_type: ContractCodeChangesChangesType,
-    },
-    DataChanges {
-        account_ids: ::std::vec::Vec<AccountId>,
-        #[serde(
-            default = "defaults::state_changes_request_view_data_changes_changes_type"
-        )]
-        changes_type: DataChangesChangesType,
-        key_prefix_base64: StoreKey,
-    },
+    ///AccountChanges
+    #[serde(rename = "account_changes")]
+    AccountChanges { account_ids: ::std::vec::Vec<AccountId> },
+    ///SingleAccessKeyChanges
+    #[serde(rename = "single_access_key_changes")]
+    SingleAccessKeyChanges { keys: ::std::vec::Vec<AccountWithPublicKey> },
+    ///AllAccessKeyChanges
+    #[serde(rename = "all_access_key_changes")]
+    AllAccessKeyChanges { account_ids: ::std::vec::Vec<AccountId> },
+    ///ContractCodeChanges
+    #[serde(rename = "contract_code_changes")]
+    ContractCodeChanges { account_ids: ::std::vec::Vec<AccountId> },
+    ///DataChanges
+    #[serde(rename = "data_changes")]
+    DataChanges { account_ids: ::std::vec::Vec<AccountId>, key_prefix_base64: StoreKey },
 }
 ///Item of the state, key and value are serialized in base64 and proof for inclusion of given state item.
 ///
@@ -9826,136 +6820,6 @@ impl ::std::convert::From<::std::vec::Vec<AccountId>> for TrackedShardsConfig {
         Self::Accounts(value)
     }
 }
-///`TransactionProcessingType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum TransactionProcessingType {
-    #[serde(rename = "transaction_processing")]
-    TransactionProcessing,
-}
-impl ::std::fmt::Display for TransactionProcessingType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::TransactionProcessing => f.write_str("transaction_processing"),
-        }
-    }
-}
-impl ::std::str::FromStr for TransactionProcessingType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "transaction_processing" => Ok(Self::TransactionProcessing),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for TransactionProcessingType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String> for TransactionProcessingType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String> for TransactionProcessingType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for TransactionProcessingType {
-    fn default() -> Self {
-        TransactionProcessingType::TransactionProcessing
-    }
-}
-///`TransactionType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum TransactionType {
-    #[serde(rename = "transaction")]
-    Transaction,
-}
-impl ::std::fmt::Display for TransactionType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::Transaction => f.write_str("transaction"),
-        }
-    }
-}
-impl ::std::str::FromStr for TransactionType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "transaction" => Ok(Self::Transaction),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for TransactionType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String> for TransactionType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String> for TransactionType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for TransactionType {
-    fn default() -> Self {
-        TransactionType::Transaction
-    }
-}
 ///`TransferAction`
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
@@ -10081,141 +6945,11 @@ impl ::std::convert::TryFrom<::std::string::String> for TxExecutionStatus {
         value.parse()
     }
 }
-///`UpdatedDelayedReceiptsType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum UpdatedDelayedReceiptsType {
-    #[serde(rename = "updated_delayed_receipts")]
-    UpdatedDelayedReceipts,
-}
-impl ::std::fmt::Display for UpdatedDelayedReceiptsType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::UpdatedDelayedReceipts => f.write_str("updated_delayed_receipts"),
-        }
-    }
-}
-impl ::std::str::FromStr for UpdatedDelayedReceiptsType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "updated_delayed_receipts" => Ok(Self::UpdatedDelayedReceipts),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for UpdatedDelayedReceiptsType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String> for UpdatedDelayedReceiptsType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String> for UpdatedDelayedReceiptsType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for UpdatedDelayedReceiptsType {
-    fn default() -> Self {
-        UpdatedDelayedReceiptsType::UpdatedDelayedReceipts
-    }
-}
 ///Use global contract action
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
 pub struct UseGlobalContractAction {
     pub contract_identifier: GlobalContractIdentifier,
-}
-///`ValidatorAccountsUpdateType`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum ValidatorAccountsUpdateType {
-    #[serde(rename = "validator_accounts_update")]
-    ValidatorAccountsUpdate,
-}
-impl ::std::fmt::Display for ValidatorAccountsUpdateType {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::ValidatorAccountsUpdate => f.write_str("validator_accounts_update"),
-        }
-    }
-}
-impl ::std::str::FromStr for ValidatorAccountsUpdateType {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "validator_accounts_update" => Ok(Self::ValidatorAccountsUpdate),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for ValidatorAccountsUpdateType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String> for ValidatorAccountsUpdateType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String> for ValidatorAccountsUpdateType {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for ValidatorAccountsUpdateType {
-    fn default() -> Self {
-        ValidatorAccountsUpdateType::ValidatorAccountsUpdate
-    }
 }
 ///`ValidatorInfo`
 ///
@@ -10260,8 +6994,7 @@ pub struct ValidatorStakeView {
     pub account_id: AccountId,
     pub public_key: PublicKey,
     pub stake: NearToken,
-    #[serde(default = "defaults::validator_stake_view_validator_stake_struct_version")]
-    pub validator_stake_struct_version: ValidatorStakeViewValidatorStakeStructVersion,
+    pub validator_stake_struct_version: ::std::string::String,
 }
 ///`ValidatorStakeViewV1`
 ///
@@ -10270,72 +7003,6 @@ pub struct ValidatorStakeViewV1 {
     pub account_id: AccountId,
     pub public_key: PublicKey,
     pub stake: NearToken,
-}
-///`ValidatorStakeViewValidatorStakeStructVersion`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-pub enum ValidatorStakeViewValidatorStakeStructVersion {
-    V1,
-}
-impl ::std::fmt::Display for ValidatorStakeViewValidatorStakeStructVersion {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        match *self {
-            Self::V1 => f.write_str("V1"),
-        }
-    }
-}
-impl ::std::str::FromStr for ValidatorStakeViewValidatorStakeStructVersion {
-    type Err = self::error::ConversionError;
-    fn from_str(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        match value {
-            "V1" => Ok(Self::V1),
-            _ => Err("invalid value".into()),
-        }
-    }
-}
-impl ::std::convert::TryFrom<&str> for ValidatorStakeViewValidatorStakeStructVersion {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &str,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<&::std::string::String>
-for ValidatorStakeViewValidatorStakeStructVersion {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: &::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::convert::TryFrom<::std::string::String>
-for ValidatorStakeViewValidatorStakeStructVersion {
-    type Error = self::error::ConversionError;
-    fn try_from(
-        value: ::std::string::String,
-    ) -> ::std::result::Result<Self, self::error::ConversionError> {
-        value.parse()
-    }
-}
-impl ::std::default::Default for ValidatorStakeViewValidatorStakeStructVersion {
-    fn default() -> Self {
-        ValidatorStakeViewValidatorStakeStructVersion::V1
-    }
 }
 ///`ValidatorStakeViews`
 ///
@@ -12838,12 +9505,6 @@ pub mod defaults {
     pub(super) fn query_request_view_state_request_type() -> super::ViewStateRequestType {
         super::ViewStateRequestType::ViewState
     }
-    pub(super) fn rpc_light_client_execution_proof_request_receipt_type() -> super::ReceiptType {
-        super::ReceiptType::Receipt
-    }
-    pub(super) fn rpc_light_client_execution_proof_request_transaction_type() -> super::TransactionType {
-        super::TransactionType::Transaction
-    }
     pub(super) fn rpc_query_request_call_function_block_id_request_type() -> super::CallFunctionBlockIdRequestType {
         super::CallFunctionBlockIdRequestType::CallFunction
     }
@@ -12928,145 +9589,10 @@ pub mod defaults {
     pub(super) fn rpc_send_transaction_request_wait_until() -> super::TxExecutionStatus {
         super::TxExecutionStatus::ExecutedOptimistic
     }
-    pub(super) fn rpc_state_changes_in_block_by_type_request_account_changes_block_id_changes_type() -> super::AccountChangesBlockIdChangesType {
-        super::AccountChangesBlockIdChangesType::AccountChanges
-    }
-    pub(super) fn rpc_state_changes_in_block_by_type_request_account_changes_finality_changes_type() -> super::AccountChangesFinalityChangesType {
-        super::AccountChangesFinalityChangesType::AccountChanges
-    }
-    pub(super) fn rpc_state_changes_in_block_by_type_request_account_changes_sync_checkpoint_changes_type() -> super::AccountChangesSyncCheckpointChangesType {
-        super::AccountChangesSyncCheckpointChangesType::AccountChanges
-    }
-    pub(super) fn rpc_state_changes_in_block_by_type_request_all_access_key_changes_block_id_changes_type() -> super::AllAccessKeyChangesBlockIdChangesType {
-        super::AllAccessKeyChangesBlockIdChangesType::AllAccessKeyChanges
-    }
-    pub(super) fn rpc_state_changes_in_block_by_type_request_all_access_key_changes_finality_changes_type() -> super::AllAccessKeyChangesFinalityChangesType {
-        super::AllAccessKeyChangesFinalityChangesType::AllAccessKeyChanges
-    }
-    pub(super) fn rpc_state_changes_in_block_by_type_request_all_access_key_changes_sync_checkpoint_changes_type() -> super::AllAccessKeyChangesSyncCheckpointChangesType {
-        super::AllAccessKeyChangesSyncCheckpointChangesType::AllAccessKeyChanges
-    }
-    pub(super) fn rpc_state_changes_in_block_by_type_request_contract_code_changes_block_id_changes_type() -> super::ContractCodeChangesBlockIdChangesType {
-        super::ContractCodeChangesBlockIdChangesType::ContractCodeChanges
-    }
-    pub(super) fn rpc_state_changes_in_block_by_type_request_contract_code_changes_finality_changes_type() -> super::ContractCodeChangesFinalityChangesType {
-        super::ContractCodeChangesFinalityChangesType::ContractCodeChanges
-    }
-    pub(super) fn rpc_state_changes_in_block_by_type_request_contract_code_changes_sync_checkpoint_changes_type() -> super::ContractCodeChangesSyncCheckpointChangesType {
-        super::ContractCodeChangesSyncCheckpointChangesType::ContractCodeChanges
-    }
-    pub(super) fn rpc_state_changes_in_block_by_type_request_data_changes_block_id_changes_type() -> super::DataChangesBlockIdChangesType {
-        super::DataChangesBlockIdChangesType::DataChanges
-    }
-    pub(super) fn rpc_state_changes_in_block_by_type_request_data_changes_finality_changes_type() -> super::DataChangesFinalityChangesType {
-        super::DataChangesFinalityChangesType::DataChanges
-    }
-    pub(super) fn rpc_state_changes_in_block_by_type_request_data_changes_sync_checkpoint_changes_type() -> super::DataChangesSyncCheckpointChangesType {
-        super::DataChangesSyncCheckpointChangesType::DataChanges
-    }
-    pub(super) fn rpc_state_changes_in_block_by_type_request_single_access_key_changes_block_id_changes_type() -> super::SingleAccessKeyChangesBlockIdChangesType {
-        super::SingleAccessKeyChangesBlockIdChangesType::SingleAccessKeyChanges
-    }
-    pub(super) fn rpc_state_changes_in_block_by_type_request_single_access_key_changes_finality_changes_type() -> super::SingleAccessKeyChangesFinalityChangesType {
-        super::SingleAccessKeyChangesFinalityChangesType::SingleAccessKeyChanges
-    }
-    pub(super) fn rpc_state_changes_in_block_by_type_request_single_access_key_changes_sync_checkpoint_changes_type() -> super::SingleAccessKeyChangesSyncCheckpointChangesType {
-        super::SingleAccessKeyChangesSyncCheckpointChangesType::SingleAccessKeyChanges
-    }
     pub(super) fn rpc_transaction_status_request_signed_tx_base64_wait_until() -> super::TxExecutionStatus {
         super::TxExecutionStatus::ExecutedOptimistic
     }
     pub(super) fn rpc_transaction_status_request_tx_hash_sender_account_id_wait_until() -> super::TxExecutionStatus {
         super::TxExecutionStatus::ExecutedOptimistic
-    }
-    pub(super) fn state_change_cause_view_action_receipt_gas_reward_type() -> super::ActionReceiptGasRewardType {
-        super::ActionReceiptGasRewardType::ActionReceiptGasReward
-    }
-    pub(super) fn state_change_cause_view_action_receipt_processing_started_type() -> super::ActionReceiptProcessingStartedType {
-        super::ActionReceiptProcessingStartedType::ActionReceiptProcessingStarted
-    }
-    pub(super) fn state_change_cause_view_bandwidth_scheduler_state_update_type() -> super::BandwidthSchedulerStateUpdateType {
-        super::BandwidthSchedulerStateUpdateType::BandwidthSchedulerStateUpdate
-    }
-    pub(super) fn state_change_cause_view_initial_state_type() -> super::InitialStateType {
-        super::InitialStateType::InitialState
-    }
-    pub(super) fn state_change_cause_view_migration_type() -> super::MigrationType {
-        super::MigrationType::Migration
-    }
-    pub(super) fn state_change_cause_view_not_writable_to_disk_type() -> super::NotWritableToDiskType {
-        super::NotWritableToDiskType::NotWritableToDisk
-    }
-    pub(super) fn state_change_cause_view_postponed_receipt_type() -> super::PostponedReceiptType {
-        super::PostponedReceiptType::PostponedReceipt
-    }
-    pub(super) fn state_change_cause_view_receipt_processing_type() -> super::ReceiptProcessingType {
-        super::ReceiptProcessingType::ReceiptProcessing
-    }
-    pub(super) fn state_change_cause_view_transaction_processing_type() -> super::TransactionProcessingType {
-        super::TransactionProcessingType::TransactionProcessing
-    }
-    pub(super) fn state_change_cause_view_updated_delayed_receipts_type() -> super::UpdatedDelayedReceiptsType {
-        super::UpdatedDelayedReceiptsType::UpdatedDelayedReceipts
-    }
-    pub(super) fn state_change_cause_view_validator_accounts_update_type() -> super::ValidatorAccountsUpdateType {
-        super::ValidatorAccountsUpdateType::ValidatorAccountsUpdate
-    }
-    pub(super) fn state_change_kind_view_access_key_touched_type() -> super::AccessKeyTouchedType {
-        super::AccessKeyTouchedType::AccessKeyTouched
-    }
-    pub(super) fn state_change_kind_view_account_touched_type() -> super::AccountTouchedType {
-        super::AccountTouchedType::AccountTouched
-    }
-    pub(super) fn state_change_kind_view_contract_code_touched_type() -> super::ContractCodeTouchedType {
-        super::ContractCodeTouchedType::ContractCodeTouched
-    }
-    pub(super) fn state_change_kind_view_data_touched_type() -> super::DataTouchedType {
-        super::DataTouchedType::DataTouched
-    }
-    pub(super) fn state_change_with_cause_view_access_key_deletion_type() -> super::AccessKeyDeletionType {
-        super::AccessKeyDeletionType::AccessKeyDeletion
-    }
-    pub(super) fn state_change_with_cause_view_access_key_update_type() -> super::AccessKeyUpdateType {
-        super::AccessKeyUpdateType::AccessKeyUpdate
-    }
-    pub(super) fn state_change_with_cause_view_account_deletion_type() -> super::AccountDeletionType {
-        super::AccountDeletionType::AccountDeletion
-    }
-    pub(super) fn state_change_with_cause_view_account_update_type() -> super::AccountUpdateType {
-        super::AccountUpdateType::AccountUpdate
-    }
-    pub(super) fn state_change_with_cause_view_contract_code_deletion_type() -> super::ContractCodeDeletionType {
-        super::ContractCodeDeletionType::ContractCodeDeletion
-    }
-    pub(super) fn state_change_with_cause_view_contract_code_update_type() -> super::ContractCodeUpdateType {
-        super::ContractCodeUpdateType::ContractCodeUpdate
-    }
-    pub(super) fn state_change_with_cause_view_data_deletion_type() -> super::DataDeletionType {
-        super::DataDeletionType::DataDeletion
-    }
-    pub(super) fn state_change_with_cause_view_data_update_type() -> super::DataUpdateType {
-        super::DataUpdateType::DataUpdate
-    }
-    pub(super) fn state_change_with_cause_view_gas_key_nonce_update_type() -> super::GasKeyNonceUpdateType {
-        super::GasKeyNonceUpdateType::GasKeyNonceUpdate
-    }
-    pub(super) fn state_changes_request_view_account_changes_changes_type() -> super::AccountChangesChangesType {
-        super::AccountChangesChangesType::AccountChanges
-    }
-    pub(super) fn state_changes_request_view_all_access_key_changes_changes_type() -> super::AllAccessKeyChangesChangesType {
-        super::AllAccessKeyChangesChangesType::AllAccessKeyChanges
-    }
-    pub(super) fn state_changes_request_view_contract_code_changes_changes_type() -> super::ContractCodeChangesChangesType {
-        super::ContractCodeChangesChangesType::ContractCodeChanges
-    }
-    pub(super) fn state_changes_request_view_data_changes_changes_type() -> super::DataChangesChangesType {
-        super::DataChangesChangesType::DataChanges
-    }
-    pub(super) fn state_changes_request_view_single_access_key_changes_changes_type() -> super::SingleAccessKeyChangesChangesType {
-        super::SingleAccessKeyChangesChangesType::SingleAccessKeyChanges
-    }
-    pub(super) fn validator_stake_view_validator_stake_struct_version() -> super::ValidatorStakeViewValidatorStakeStructVersion {
-        super::ValidatorStakeViewValidatorStakeStructVersion::V1
     }
 }

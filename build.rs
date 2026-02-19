@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use std::fs;
 use std::path::Path;
 
@@ -233,55 +233,40 @@ fn merge_variant_properties(
     Some(serde_json::Value::Object(result))
 }
 
-/// Convert `"const"` string properties into single-variant enums with a default value.
+/// Convert the `request_type` `"const"` property into a single-variant enum with a default.
 ///
-/// When a JSON Schema property has `{"const": "some_value", "type": "string"}`, typify
-/// ignores the `const` and generates a plain `String` field. By converting it to
+/// Only targets the `request_type` field specifically. When a JSON Schema property has
+/// `{"const": "some_value", "type": "string"}`, typify ignores the `const` and generates
+/// a plain `String` field. By converting it to
 /// `{"enum": ["some_value"], "type": "string", "default": "some_value"}`, typify generates
 /// a single-variant enum type with a `Default` impl. Combined with removing the property
 /// from `required`, this lets users omit the field during construction — serde fills it
 /// in automatically via `#[serde(default)]`.
+///
+/// This is intentionally restricted to `request_type` to avoid making other const
+/// discriminator fields (e.g. `type` in `StateChangeCauseView`) optional, which would
+/// weaken deserialization strictness.
 fn convert_const_to_defaulted_enum(schema: &mut serde_json::Value) {
     match schema {
         serde_json::Value::Object(obj) => {
-            // Check if this object has "properties" containing const fields
-            if let Some(serde_json::Value::Object(props)) = obj.get_mut("properties") {
-                let const_prop_names: Vec<String> = props
-                    .iter()
-                    .filter_map(|(name, prop)| {
-                        let prop_obj = prop.as_object()?;
-                        if prop_obj.contains_key("const") {
-                            Some(name.clone())
-                        } else {
-                            None
-                        }
-                    })
-                    .collect();
+            // Check if this object has a "request_type" property with a const value
+            if let Some(serde_json::Value::Object(props)) = obj.get_mut("properties")
+                && let Some(prop) = props.get_mut("request_type")
+                && let Some(prop_obj) = prop.as_object_mut()
+                && let Some(const_val) = prop_obj.get("const").cloned()
+            {
+                // Replace {"const": "val", "type": "string"}
+                // with {"enum": ["val"], "type": "string", "default": "val"}
+                prop_obj.remove("const");
+                prop_obj.insert(
+                    "enum".to_string(),
+                    serde_json::Value::Array(vec![const_val.clone()]),
+                );
+                prop_obj.insert("default".to_string(), const_val);
 
-                for name in &const_prop_names {
-                    if let Some(prop) = props.get_mut(name)
-                        && let Some(prop_obj) = prop.as_object_mut()
-                        && let Some(const_val) = prop_obj.get("const").cloned()
-                    {
-                        // Replace {"const": "val", "type": "string"}
-                        // with {"enum": ["val"], "type": "string", "default": "val"}
-                        prop_obj.remove("const");
-                        prop_obj.insert(
-                            "enum".to_string(),
-                            serde_json::Value::Array(vec![const_val.clone()]),
-                        );
-                        prop_obj.insert("default".to_string(), const_val);
-                    }
-                }
-
-                // Remove const properties from `required` so serde uses the default
-                if !const_prop_names.is_empty()
-                    && let Some(serde_json::Value::Array(required)) = obj.get_mut("required")
-                {
-                    required.retain(|r| {
-                        r.as_str()
-                            .is_none_or(|s| !const_prop_names.contains(&s.to_string()))
-                    });
+                // Remove request_type from `required` so serde uses the default
+                if let Some(serde_json::Value::Array(required)) = obj.get_mut("required") {
+                    required.retain(|r| r.as_str() != Some("request_type"));
                 }
             }
 
@@ -652,8 +637,8 @@ fn generate_serialize_impl(enum_name: &str, variants: &[VariantInfo]) -> String 
 /// first extracts `request_type` from the JSON, then uses it plus the present fields
 /// to pick the correct variant.
 fn generate_deserialize_impl(enum_name: &str, variants: &[VariantInfo]) -> String {
-    // Group variants by request_type value
-    let mut variants_by_rt: HashMap<&str, Vec<&VariantInfo>> = HashMap::new();
+    // Group variants by request_type value (BTreeMap for deterministic codegen output)
+    let mut variants_by_rt: BTreeMap<&str, Vec<&VariantInfo>> = BTreeMap::new();
     for v in variants {
         variants_by_rt
             .entry(v.request_type_const.as_str())
