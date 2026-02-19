@@ -2,7 +2,7 @@
 //!
 //! Run with: cargo run --example mainnet
 
-use near_openrpc_client::{client::Result, types::*, NearRpcClient};
+use near_openrpc_client::{NearRpcClient, client::Result, types::*};
 
 #[tokio::main]
 async fn main() -> Result<()> {

@@ -205,20 +205,14 @@ impl NearRpcClient {
     }
 
     /// Queries status of a transaction by hash.
-    pub async fn tx(
-        &self,
-        request: RpcTransactionStatusRequest,
-    ) -> Result<RpcTransactionResponse> {
+    pub async fn tx(&self, request: RpcTransactionStatusRequest) -> Result<RpcTransactionResponse> {
         self.call("tx", request).await
     }
 
     // ── Validators ───────────────────────────────────────────────
 
     /// Queries active validators on the network for a given epoch.
-    pub async fn validators(
-        &self,
-        request: RpcValidatorRequest,
-    ) -> Result<RpcValidatorResponse> {
+    pub async fn validators(&self, request: RpcValidatorRequest) -> Result<RpcValidatorResponse> {
         self.call("validators", request).await
     }
 
