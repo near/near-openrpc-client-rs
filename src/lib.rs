@@ -24,6 +24,7 @@
 //! }
 //! ```
 
+mod token_helpers;
 pub mod types;
 
 #[cfg(feature = "client")]
