@@ -30,4 +30,4 @@ prettyplease = "0.2"
 [features]
 default = ["client"]
 client = ["reqwest", "tokio"]
-near-primitives = ["near-token", "near-gas"]
+near-types = ["near-token", "near-gas"]

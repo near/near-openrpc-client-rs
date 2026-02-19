@@ -73,7 +73,7 @@ impl NearGas {
 // Optional interop with near-token / near-gas crates
 // ---------------------------------------------------------------------------
 
-#[cfg(feature = "near-primitives")]
+#[cfg(feature = "near-types")]
 mod interop {
     use super::*;
 
@@ -186,7 +186,7 @@ mod tests {
         assert_eq!(gas.as_gas(), deserialized.as_gas());
     }
 
-    #[cfg(feature = "near-primitives")]
+    #[cfg(feature = "near-types")]
     mod interop_tests {
         use super::*;
 
