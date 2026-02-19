@@ -20,6 +20,12 @@
 //!     let client = NearRpcClient::mainnet();
 //!     let status = client.status().await?;
 //!     println!("Chain: {} at block {}", status.chain_id, status.sync_info.latest_block_height);
+//!
+//!     let account = client.view_account(RpcViewAccountRequest::FinalityAccountId {
+//!         account_id: "near".parse().unwrap(),
+//!         finality: Finality::Final,
+//!     }).await?;
+//!     println!("Balance: {}", account.amount);
 //!     Ok(())
 //! }
 //! ```

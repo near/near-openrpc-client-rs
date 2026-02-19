@@ -15,12 +15,12 @@ async fn main() -> near_openrpc_client::client::Result<()> {
     let status = client.status().await?;
     println!("Chain: {} at block {}", status.chain_id, status.sync_info.latest_block_height);
 
-    // Query an account
-    let account = client.query(RpcQueryRequest::ViewAccountFinality {
-        finality: Finality::Final,
+    // View an account
+    let account = client.view_account(RpcViewAccountRequest::FinalityAccountId {
         account_id: "near".parse().unwrap(),
-        request_type: "view_account".to_string(),
+        finality: Finality::Final,
     }).await?;
+    println!("Balance: {}", account.amount);
 
     Ok(())
 }
@@ -42,7 +42,7 @@ near-openrpc-client = { version = "0.1", default-features = false }
 
 ## How it works
 
-At build time, `build.rs` reads `openrpc.json`, transforms the schema (including a cartesian-product expansion of `allOf` refs for better enum variant names), and feeds it to `typify` to generate `src/generated.rs`.
+At build time, `build.rs` reads `openrpc.json`, converts it to a JSON Schema, and feeds it to `typify` to generate `src/generated.rs`.
 
 A daily GitHub Action fetches the latest spec from nearcore and opens a PR if anything changed.
 
