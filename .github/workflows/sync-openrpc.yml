@@ -1,0 +1,54 @@
+name: Sync OpenRPC spec from nearcore
+
+on:
+  schedule:
+    - cron: "0 6 * * *" # Daily at 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch latest openrpc.json from nearcore
+        run: |
+          curl -sSfL \
+            "https://raw.githubusercontent.com/near/nearcore/master/chain/jsonrpc/openapi/openrpc.json" \
+            -o openrpc.json
+
+      - name: Check for changes
+        id: diff
+        run: |
+          if git diff --quiet openrpc.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install Rust toolchain
+        if: steps.diff.outputs.changed == 'true'
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Regenerate types
+        if: steps.diff.outputs.changed == 'true'
+        run: cargo build
+
+      - name: Create Pull Request
+        if: steps.diff.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: chore/sync-openrpc-spec
+          commit-message: "chore: sync openrpc.json and regenerate types"
+          title: "chore: sync openrpc.json and regenerate types"
+          body: |
+            Auto-generated PR to update `openrpc.json` from
+            [nearcore master](https://github.com/near/nearcore/blob/master/chain/jsonrpc/openapi/openrpc.json)
+            and regenerate `src/generated.rs`.
+
+            Please review the diff and verify correctness.
+          labels: automated
