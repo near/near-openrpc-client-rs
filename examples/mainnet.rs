@@ -2,6 +2,7 @@
 //!
 //! Run with: cargo run --example mainnet
 
+use base64::{Engine, engine::general_purpose::STANDARD};
 use near_openrpc_client::{NearRpcClient, client::Result, types::*};
 
 #[tokio::main]
@@ -46,8 +47,48 @@ async fn main() -> Result<()> {
     println!("   Gas price: {} yoctoNEAR", gas.gas_price);
     println!();
 
-    // 4. Validators
-    println!("4. Fetching current validators...");
+    // 4. View account
+    println!("4. Viewing account 'near'...");
+    let account = client
+        .view_account(RpcViewAccountRequest::FinalityAccountId {
+            account_id: "near".parse().unwrap(),
+            finality: Finality::Final,
+        })
+        .await?;
+    println!("   Balance: {} yoctoNEAR", account.amount);
+    println!("   Locked: {} yoctoNEAR", account.locked);
+    println!("   Storage usage: {} bytes", account.storage_usage);
+    println!("   Code hash: {}", account.code_hash);
+    println!();
+
+    // 5. Call view function
+    println!("5. Calling view function on wrap.near...");
+    let args = serde_json::json!({"account_id": "near"});
+    let result = client
+        .call_function(RpcCallFunctionRequest::FinalityAccountId {
+            account_id: "wrap.near".parse().unwrap(),
+            method_name: "ft_balance_of".to_string(),
+            args_base64: STANDARD.encode(args.to_string()).into(),
+            finality: Finality::Final,
+        })
+        .await?;
+    println!("   Result: {}", String::from_utf8_lossy(&result.result));
+    println!("   Block height: {}", result.block_height);
+    println!();
+
+    // 6. View access keys
+    println!("6. Viewing access keys for 'near'...");
+    let keys = client
+        .view_access_key_list(RpcViewAccessKeyListRequest::FinalityAccountId {
+            account_id: "near".parse().unwrap(),
+            finality: Finality::Final,
+        })
+        .await?;
+    println!("   Access keys: {}", keys.keys.len());
+    println!();
+
+    // 7. Validators
+    println!("7. Fetching current validators...");
     let validators = client.validators(RpcValidatorRequest::Latest).await?;
     println!(
         "   Current validators: {}",
@@ -62,8 +103,8 @@ async fn main() -> Result<()> {
     }
     println!();
 
-    // 5. Network info
-    println!("5. Fetching network info...");
+    // 8. Network info
+    println!("8. Fetching network info...");
     let network = client.network_info().await?;
     println!("   Active peers: {}", network.active_peers.len());
     println!("   Known producers: {}", network.known_producers.len());
