@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
 
@@ -38,6 +39,11 @@ fn main() {
     // instead of opaque names like Variant0, Variant1.
     expand_allof_refs(&mut schema);
 
+    // Preprocess: convert `"const"` string properties into single-variant enums with a default.
+    // This makes typify generate a type with `Default` so users don't have to set fields like
+    // `request_type` manually — the const value is filled in automatically.
+    convert_const_to_defaulted_enum(&mut schema);
+
     // Generate Rust types with typify
     let mut type_space = typify::TypeSpace::default();
     type_space
@@ -52,7 +58,11 @@ fn main() {
     // Strip verbose JSON schema doc blocks and fix doctests
     let stripped = strip_json_schema_docs(&formatted);
 
-    fs::write(out_path, stripped).expect("Failed to write generated.rs");
+    // Post-process: remove `request_type` fields from enum variants and generate custom
+    // Serialize impls that inject the correct const value automatically.
+    let final_code = elide_const_request_type_fields(&stripped);
+
+    fs::write(out_path, final_code).expect("Failed to write generated.rs");
 }
 
 fn prettyplease_format(code: &str) -> Option<String> {
@@ -221,6 +231,575 @@ fn merge_variant_properties(
     result.insert("type".to_string(), serde_json::json!("object"));
 
     Some(serde_json::Value::Object(result))
+}
+
+/// Convert `"const"` string properties into single-variant enums with a default value.
+///
+/// When a JSON Schema property has `{"const": "some_value", "type": "string"}`, typify
+/// ignores the `const` and generates a plain `String` field. By converting it to
+/// `{"enum": ["some_value"], "type": "string", "default": "some_value"}`, typify generates
+/// a single-variant enum type with a `Default` impl. Combined with removing the property
+/// from `required`, this lets users omit the field during construction — serde fills it
+/// in automatically via `#[serde(default)]`.
+fn convert_const_to_defaulted_enum(schema: &mut serde_json::Value) {
+    match schema {
+        serde_json::Value::Object(obj) => {
+            // Check if this object has "properties" containing const fields
+            if let Some(serde_json::Value::Object(props)) = obj.get_mut("properties") {
+                let const_prop_names: Vec<String> = props
+                    .iter()
+                    .filter_map(|(name, prop)| {
+                        let prop_obj = prop.as_object()?;
+                        if prop_obj.contains_key("const") {
+                            Some(name.clone())
+                        } else {
+                            None
+                        }
+                    })
+                    .collect();
+
+                for name in &const_prop_names {
+                    if let Some(prop) = props.get_mut(name)
+                        && let Some(prop_obj) = prop.as_object_mut()
+                        && let Some(const_val) = prop_obj.get("const").cloned()
+                    {
+                        // Replace {"const": "val", "type": "string"}
+                        // with {"enum": ["val"], "type": "string", "default": "val"}
+                        prop_obj.remove("const");
+                        prop_obj.insert(
+                            "enum".to_string(),
+                            serde_json::Value::Array(vec![const_val.clone()]),
+                        );
+                        prop_obj.insert("default".to_string(), const_val);
+                    }
+                }
+
+                // Remove const properties from `required` so serde uses the default
+                if !const_prop_names.is_empty()
+                    && let Some(serde_json::Value::Array(required)) = obj.get_mut("required")
+                {
+                    required.retain(|r| {
+                        r.as_str()
+                            .is_none_or(|s| !const_prop_names.contains(&s.to_string()))
+                    });
+                }
+            }
+
+            // Recurse into all values
+            for (_, v) in obj.iter_mut() {
+                convert_const_to_defaulted_enum(v);
+            }
+        }
+        serde_json::Value::Array(arr) => {
+            for v in arr.iter_mut() {
+                convert_const_to_defaulted_enum(v);
+            }
+        }
+        _ => {}
+    }
+}
+
+/// Remove `request_type` fields from enum variants and generate custom `Serialize` impls
+/// that inject the correct const value during serialization.
+///
+/// After `convert_const_to_defaulted_enum` transforms the schema, typify generates enum
+/// variants with `request_type: SomeRequestType` fields and `#[serde(default = "...")]`.
+/// This function goes further: it removes those fields entirely so users don't need to
+/// specify them during construction, and generates `Serialize` impls that inject the
+/// correct const value into the JSON output.
+fn elide_const_request_type_fields(code: &str) -> String {
+    // Step 1: Build a map from RequestType type names to their serde rename (const) values.
+    let request_type_values = extract_request_type_values(code);
+
+    // Step 2: For each target enum, collect variant info, remove request_type fields,
+    // and generate a custom Serialize impl.
+    let mut result = code.to_string();
+
+    for enum_name in &["RpcQueryRequest", "QueryRequest"] {
+        if let Some(processed) =
+            process_enum_request_type(&result, enum_name, &request_type_values)
+        {
+            result = processed;
+        }
+    }
+
+    result
+}
+
+/// Extract a mapping from RequestType type names to their const string values.
+///
+/// Scans for single-variant enums like:
+/// ```ignore
+/// pub enum ViewAccountBlockIdRequestType {
+///     #[serde(rename = "view_account")]
+///     ViewAccount,
+/// }
+/// ```
+fn extract_request_type_values(code: &str) -> HashMap<String, String> {
+    let mut map = HashMap::new();
+    let lines: Vec<&str> = code.lines().collect();
+
+    for (i, line) in lines.iter().enumerate() {
+        let trimmed = line.trim();
+        if let Some(rest) = trimmed.strip_prefix("pub enum ")
+            && let Some(name) = rest.strip_suffix(" {")
+            && name.ends_with("RequestType")
+        {
+            for inner_line in lines.iter().skip(i + 1).take(4) {
+                let inner = inner_line.trim();
+                if let Some(attr_rest) = inner.strip_prefix("#[serde(rename = \"")
+                    && let Some(value) = attr_rest.strip_suffix("\")]")
+                {
+                    map.insert(name.to_string(), value.to_string());
+                    break;
+                }
+            }
+        }
+    }
+
+    map
+}
+
+/// Parsed info about an enum variant's fields.
+struct VariantInfo {
+    name: String,
+    /// The const value for request_type (if it has one).
+    request_type_const: String,
+    /// Fields other than request_type, as (name, type, serde_attributes) tuples.
+    fields: Vec<VariantField>,
+}
+
+struct VariantField {
+    name: String,
+    type_str: String,
+    /// Any `#[serde(...)]` attributes on the field.
+    serde_attrs: Vec<String>,
+}
+
+/// Process a single enum: remove `request_type` fields and generate a custom Serialize impl.
+fn process_enum_request_type(
+    code: &str,
+    enum_name: &str,
+    request_type_values: &HashMap<String, String>,
+) -> Option<String> {
+    let lines: Vec<&str> = code.lines().collect();
+    let enum_pattern = format!("pub enum {enum_name} {{");
+    let enum_start = lines.iter().position(|l| l.trim() == enum_pattern)?;
+
+    // Find the derive line
+    let mut derive_line = None;
+    for i in (0..enum_start).rev() {
+        let trimmed = lines[i].trim();
+        if trimmed.starts_with("#[derive(") {
+            derive_line = Some(i);
+            break;
+        }
+        if !trimmed.is_empty()
+            && !trimmed.starts_with("///")
+            && !trimmed.starts_with("#[")
+            && !trimmed.starts_with("//")
+        {
+            break;
+        }
+    }
+    let derive_line = derive_line?;
+
+    // Find the enum's closing brace
+    let mut brace_depth = 0;
+    let mut enum_end = enum_start;
+    for (i, line) in lines.iter().enumerate().skip(enum_start) {
+        for ch in line.chars() {
+            if ch == '{' {
+                brace_depth += 1;
+            } else if ch == '}' {
+                brace_depth -= 1;
+                if brace_depth == 0 {
+                    enum_end = i;
+                    break;
+                }
+            }
+        }
+        if brace_depth == 0 && i > enum_start {
+            break;
+        }
+    }
+
+    // Parse variant info
+    let variants = parse_enum_variants(&lines, enum_start + 1, enum_end, request_type_values);
+
+    if variants.is_empty() {
+        return None;
+    }
+
+    // Rebuild the code
+    let mut new_lines: Vec<String> = Vec::new();
+
+    // Lines before the derive
+    new_lines.extend(lines[..derive_line].iter().map(|l| l.to_string()));
+
+    // Remove both Serialize and Deserialize from derive (we impl both manually)
+    let modified_derive = lines[derive_line]
+        .replace("::serde::Deserialize, ::serde::Serialize, ", "")
+        .replace("::serde::Deserialize, ", "")
+        .replace(", ::serde::Deserialize", "")
+        .replace("::serde::Serialize, ", "")
+        .replace(", ::serde::Serialize", "")
+        .replace("::serde::Serialize", "")
+        .replace("::serde::Deserialize", "");
+    new_lines.push(modified_derive);
+
+    // Lines between derive and enum body opening, but remove #[serde(untagged)]
+    for line in &lines[derive_line + 1..=enum_start] {
+        let trimmed = line.trim();
+        if trimmed == "#[serde(untagged)]" {
+            continue;
+        }
+        new_lines.push(line.to_string());
+    }
+
+    // Rebuild enum body without request_type fields and without serde attributes
+    // (since we removed derive(Serialize, Deserialize), serde attributes would be invalid)
+    for variant in &variants {
+        new_lines.push(format!("    {} {{", variant.name));
+        for field in &variant.fields {
+            // Skip serde attributes — our custom impls handle serialization logic
+            new_lines.push(format!("        {}: {},", field.name, field.type_str));
+        }
+        new_lines.push("    },".to_string());
+    }
+
+    // Close enum
+    new_lines.push("}".to_string());
+
+    // Generate custom Serialize and Deserialize impls
+    new_lines.push(String::new());
+    new_lines.push(generate_serialize_impl(enum_name, &variants));
+    new_lines.push(String::new());
+    new_lines.push(generate_deserialize_impl(enum_name, &variants));
+
+    // Copy remaining lines after the original enum
+    new_lines.extend(lines[enum_end + 1..].iter().map(|l| l.to_string()));
+
+    let joined = new_lines.join("\n");
+    prettyplease_format(&joined).or(Some(joined))
+}
+
+/// Parse enum variants from the generated code, extracting field info.
+fn parse_enum_variants(
+    lines: &[&str],
+    start: usize,
+    end: usize,
+    request_type_values: &HashMap<String, String>,
+) -> Vec<VariantInfo> {
+    let mut variants = Vec::new();
+    let mut i = start;
+
+    while i < end {
+        let trimmed = lines[i].trim();
+
+        // Skip doc comments and attributes before variant name
+        if trimmed.starts_with("///") || trimmed.starts_with("#[") || trimmed.is_empty() {
+            i += 1;
+            continue;
+        }
+
+        // Match variant name: "VariantName {"
+        if let Some(variant_name) = trimmed.strip_suffix(" {") {
+            let mut fields = Vec::new();
+            let mut request_type_const = None;
+            i += 1;
+
+            // Parse fields until closing },
+            let mut pending_serde_attrs: Vec<String> = Vec::new();
+            while i < end {
+                let field_trimmed = lines[i].trim();
+
+                if field_trimmed == "}," || field_trimmed == "}" {
+                    i += 1;
+                    break;
+                }
+
+                // Collect serde attributes
+                if field_trimmed.starts_with("#[serde(") {
+                    let mut attr = field_trimmed.to_string();
+                    if !field_trimmed.ends_with(")]") {
+                        // Multi-line attribute
+                        i += 1;
+                        while i < end && !lines[i].trim().ends_with(")]") {
+                            attr.push(' ');
+                            attr.push_str(lines[i].trim());
+                            i += 1;
+                        }
+                        if i < end {
+                            attr.push(' ');
+                            attr.push_str(lines[i].trim());
+                        }
+                    }
+                    pending_serde_attrs.push(attr);
+                    i += 1;
+                    continue;
+                }
+
+                // Parse field: "field_name: Type,"
+                if let Some(colon_pos) = field_trimmed.find(": ") {
+                    let field_name = &field_trimmed[..colon_pos];
+                    let type_with_comma = &field_trimmed[colon_pos + 2..];
+                    let type_str = type_with_comma.trim_end_matches(',');
+
+                    if field_name == "request_type" {
+                        // Check if this is a known const request type
+                        if let Some(const_val) = request_type_values.get(type_str) {
+                            request_type_const = Some(const_val.clone());
+                            pending_serde_attrs.clear();
+                            i += 1;
+                            continue;
+                        }
+                    }
+
+                    fields.push(VariantField {
+                        name: field_name.to_string(),
+                        type_str: type_str.to_string(),
+                        serde_attrs: std::mem::take(&mut pending_serde_attrs),
+                    });
+                }
+
+                i += 1;
+            }
+
+            if let Some(const_val) = request_type_const {
+                variants.push(VariantInfo {
+                    name: variant_name.to_string(),
+                    request_type_const: const_val,
+                    fields,
+                });
+            }
+        } else {
+            i += 1;
+        }
+    }
+
+    variants
+}
+
+/// Generate a custom `Serialize` impl that serializes each variant's fields as a flat map
+/// and injects the `request_type` field with the correct const value.
+fn generate_serialize_impl(enum_name: &str, variants: &[VariantInfo]) -> String {
+    let mut match_arms = String::new();
+
+    for variant in variants {
+        let field_names: Vec<&str> = variant.fields.iter().map(|f| f.name.as_str()).collect();
+        let bindings = field_names.join(", ");
+        let field_count = field_names.len() + 1; // +1 for request_type
+
+        let mut serialize_fields = String::new();
+        for field in &variant.fields {
+            // Check if the field has skip_serializing_if
+            let has_skip = field
+                .serde_attrs
+                .iter()
+                .any(|a| a.contains("skip_serializing_if"));
+
+            if has_skip {
+                // For Option fields with skip_serializing_if, only serialize if Some
+                serialize_fields.push_str(&format!(
+                    "            if {name}.is_some() {{\n                map.serialize_entry(\"{name}\", {name})?;\n            }}\n",
+                    name = field.name,
+                ));
+            } else {
+                serialize_fields.push_str(&format!(
+                    "            map.serialize_entry(\"{name}\", {name})?;\n",
+                    name = field.name,
+                ));
+            }
+        }
+
+        match_arms.push_str(&format!(
+            r#"            {enum_name}::{variant_name} {{ {bindings} }} => {{
+                let mut map = serializer.serialize_map(::std::option::Option::Some({field_count}))?;
+{serialize_fields}            map.serialize_entry("request_type", "{const_value}")?;
+                map.end()
+            }}
+"#,
+            enum_name = enum_name,
+            variant_name = variant.name,
+            bindings = bindings,
+            field_count = field_count,
+            serialize_fields = serialize_fields,
+            const_value = variant.request_type_const,
+        ));
+    }
+
+    format!(
+        r#"impl ::serde::Serialize for {enum_name} {{
+    fn serialize<S>(&self, serializer: S) -> ::std::result::Result<S::Ok, S::Error>
+    where
+        S: ::serde::Serializer,
+    {{
+        use ::serde::ser::SerializeMap;
+        match self {{
+{match_arms}        }}
+    }}
+}}"#,
+        enum_name = enum_name,
+        match_arms = match_arms,
+    )
+}
+
+/// Generate a custom `Deserialize` impl that uses `request_type` as a discriminator.
+///
+/// Since we removed `request_type` from the enum variant fields, serde's untagged
+/// deserialization can't distinguish variants with the same field structure. This impl
+/// first extracts `request_type` from the JSON, then uses it plus the present fields
+/// to pick the correct variant.
+fn generate_deserialize_impl(enum_name: &str, variants: &[VariantInfo]) -> String {
+    // Group variants by request_type value
+    let mut variants_by_rt: HashMap<&str, Vec<&VariantInfo>> = HashMap::new();
+    for v in variants {
+        variants_by_rt
+            .entry(v.request_type_const.as_str())
+            .or_default()
+            .push(v);
+    }
+
+    // Generate match arms for each request_type value
+    let mut rt_arms = String::new();
+    for (rt_value, rt_variants) in &variants_by_rt {
+        if rt_variants.len() == 1 {
+            // Single variant for this request_type — straightforward
+            let v = rt_variants[0];
+            let field_extractions = generate_field_extractions(&v.fields, enum_name);
+            rt_arms.push_str(&format!(
+                "                \"{rt_value}\" => {{\n{field_extractions}                    Ok({enum_name}::{variant_name} {{ {field_names} }})\n                }}\n",
+                rt_value = rt_value,
+                enum_name = enum_name,
+                variant_name = v.name,
+                field_extractions = field_extractions,
+                field_names = v.fields.iter().map(|f| f.name.as_str()).collect::<Vec<_>>().join(", "),
+            ));
+        } else {
+            // Multiple variants share this request_type — discriminate by which extra
+            // fields are present (e.g., block_id vs finality vs sync_checkpoint)
+            let mut inner_arms = String::new();
+            for (idx, v) in rt_variants.iter().enumerate() {
+                let field_extractions = generate_field_extractions(&v.fields, enum_name);
+                let discriminating_fields: Vec<&str> = v
+                    .fields
+                    .iter()
+                    .filter(|f| {
+                        // Fields that aren't present in ALL variants of this request_type
+                        !rt_variants.iter().all(|other| {
+                            other.fields.iter().any(|of| of.name == f.name)
+                        })
+                    })
+                    .map(|f| f.name.as_str())
+                    .collect();
+
+                let condition = if !discriminating_fields.is_empty() {
+                    discriminating_fields
+                        .iter()
+                        .map(|f| format!("map.contains_key(\"{f}\")"))
+                        .collect::<Vec<_>>()
+                        .join(" && ")
+                } else if idx == rt_variants.len() - 1 {
+                    // Last variant is the fallback
+                    "true".to_string()
+                } else {
+                    "true".to_string()
+                };
+
+                if idx == 0 {
+                    inner_arms.push_str(&format!(
+                        "                    if {condition} {{\n{field_extractions}                        Ok({enum_name}::{variant_name} {{ {field_names} }})\n",
+                        condition = condition,
+                        enum_name = enum_name,
+                        variant_name = v.name,
+                        field_extractions = field_extractions,
+                        field_names = v.fields.iter().map(|f| f.name.as_str()).collect::<Vec<_>>().join(", "),
+                    ));
+                } else if idx == rt_variants.len() - 1 {
+                    inner_arms.push_str(&format!(
+                        "                    }} else {{\n{field_extractions}                        Ok({enum_name}::{variant_name} {{ {field_names} }})\n                    }}\n",
+                        enum_name = enum_name,
+                        variant_name = v.name,
+                        field_extractions = field_extractions,
+                        field_names = v.fields.iter().map(|f| f.name.as_str()).collect::<Vec<_>>().join(", "),
+                    ));
+                } else {
+                    inner_arms.push_str(&format!(
+                        "                    }} else if {condition} {{\n{field_extractions}                        Ok({enum_name}::{variant_name} {{ {field_names} }})\n",
+                        condition = condition,
+                        enum_name = enum_name,
+                        variant_name = v.name,
+                        field_extractions = field_extractions,
+                        field_names = v.fields.iter().map(|f| f.name.as_str()).collect::<Vec<_>>().join(", "),
+                    ));
+                }
+            }
+
+            rt_arms.push_str(&format!(
+                "                \"{rt_value}\" => {{\n{inner_arms}                }}\n",
+                rt_value = rt_value,
+                inner_arms = inner_arms,
+            ));
+        }
+    }
+
+    format!(
+        r#"impl<'de> ::serde::Deserialize<'de> for {enum_name} {{
+    fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
+    where
+        D: ::serde::Deserializer<'de>,
+    {{
+        let map: serde_json::Map<::std::string::String, serde_json::Value> =
+            serde_json::Map::deserialize(deserializer)?;
+
+        let request_type = map
+            .get("request_type")
+            .and_then(|v| v.as_str())
+            .ok_or_else(|| ::serde::de::Error::missing_field("request_type"))?;
+
+        match request_type {{
+{rt_arms}                other => Err(::serde::de::Error::unknown_variant(
+                    other,
+                    &[{known_variants}],
+                )),
+        }}
+    }}
+}}"#,
+        enum_name = enum_name,
+        rt_arms = rt_arms,
+        known_variants = variants_by_rt
+            .keys()
+            .map(|k| format!("\"{k}\""))
+            .collect::<Vec<_>>()
+            .join(", "),
+    )
+}
+
+/// Generate field extraction code from a serde_json::Map for a variant's fields.
+fn generate_field_extractions(fields: &[VariantField], _enum_name: &str) -> String {
+    let mut code = String::new();
+
+    for field in fields {
+        let is_optional = field
+            .serde_attrs
+            .iter()
+            .any(|a| a.contains("skip_serializing_if"));
+
+        if is_optional {
+            code.push_str(&format!(
+                "                    let {name} = map.get(\"{name}\").cloned().map(serde_json::from_value).transpose().map_err(::serde::de::Error::custom)?;\n",
+                name = field.name,
+            ));
+        } else {
+            code.push_str(&format!(
+                "                    let {name} = map.get(\"{name}\").cloned().ok_or_else(|| ::serde::de::Error::missing_field(\"{name}\")).and_then(|v| serde_json::from_value(v).map_err(::serde::de::Error::custom))?;\n",
+                name = field.name,
+            ));
+        }
+    }
+
+    code
 }
 
 /// Strip JSON schema documentation blocks from generated code.

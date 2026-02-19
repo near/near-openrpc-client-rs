@@ -4,6 +4,7 @@
 //! Do not edit `generated.rs` manually — it will be overwritten.
 
 #[allow(
+    dead_code,
     clippy::infallible_try_from,
     clippy::doc_lazy_continuation,
     clippy::doc_overindented_list_items,
@@ -13,3 +14,85 @@ mod inner {
     include!("generated.rs");
 }
 pub use inner::*;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn rpc_query_request_view_account_finality_serializes_request_type() {
+        let req = RpcQueryRequest::ViewAccountFinality {
+            account_id: "example.near".parse().unwrap(),
+            finality: Finality::Final,
+        };
+        let json = serde_json::to_value(&req).unwrap();
+        assert_eq!(json["request_type"], "view_account");
+        assert_eq!(json["account_id"], "example.near");
+        assert_eq!(json["finality"], "final");
+    }
+
+    #[test]
+    fn rpc_query_request_view_account_block_id_serializes_request_type() {
+        let req = RpcQueryRequest::ViewAccountBlockId {
+            account_id: "example.near".parse().unwrap(),
+            block_id: BlockId::BlockHeight(12345),
+        };
+        let json = serde_json::to_value(&req).unwrap();
+        assert_eq!(json["request_type"], "view_account");
+        assert_eq!(json["account_id"], "example.near");
+        assert_eq!(json["block_id"], 12345);
+    }
+
+    #[test]
+    fn rpc_query_request_call_function_finality_serializes_request_type() {
+        let req = RpcQueryRequest::CallFunctionFinality {
+            account_id: "example.near".parse().unwrap(),
+            args_base64: "e30=".parse().unwrap(),
+            finality: Finality::Final,
+            method_name: "get_num".to_string(),
+        };
+        let json = serde_json::to_value(&req).unwrap();
+        assert_eq!(json["request_type"], "call_function");
+        assert_eq!(json["method_name"], "get_num");
+    }
+
+    #[test]
+    fn rpc_query_request_roundtrip() {
+        let req = RpcQueryRequest::ViewAccountFinality {
+            account_id: "example.near".parse().unwrap(),
+            finality: Finality::Final,
+        };
+        let json_str = serde_json::to_string(&req).unwrap();
+        let deserialized: RpcQueryRequest = serde_json::from_str(&json_str).unwrap();
+
+        // Verify the deserialized value re-serializes identically
+        let json_str2 = serde_json::to_string(&deserialized).unwrap();
+        let v1: serde_json::Value = serde_json::from_str(&json_str).unwrap();
+        let v2: serde_json::Value = serde_json::from_str(&json_str2).unwrap();
+        assert_eq!(v1, v2);
+    }
+
+    #[test]
+    fn query_request_view_account_serializes_request_type() {
+        let req = QueryRequest::ViewAccount {
+            account_id: "example.near".parse().unwrap(),
+        };
+        let json = serde_json::to_value(&req).unwrap();
+        assert_eq!(json["request_type"], "view_account");
+        assert_eq!(json["account_id"], "example.near");
+    }
+
+    #[test]
+    fn query_request_roundtrip() {
+        let req = QueryRequest::ViewCode {
+            account_id: "example.near".parse().unwrap(),
+        };
+        let json_str = serde_json::to_string(&req).unwrap();
+        let deserialized: QueryRequest = serde_json::from_str(&json_str).unwrap();
+
+        let json_str2 = serde_json::to_string(&deserialized).unwrap();
+        let v1: serde_json::Value = serde_json::from_str(&json_str).unwrap();
+        let v2: serde_json::Value = serde_json::from_str(&json_str2).unwrap();
+        assert_eq!(v1, v2);
+    }
+}

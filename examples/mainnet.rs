@@ -52,7 +52,6 @@ async fn main() -> Result<()> {
         .query(RpcQueryRequest::ViewAccountFinality {
             finality: Finality::Final,
             account_id: "near".parse().expect("valid account id"),
-            request_type: "view_account".to_string(),
         })
         .await?;
 
@@ -79,7 +78,6 @@ async fn main() -> Result<()> {
             account_id: "wrap.near".parse().expect("valid account id"),
             method_name: "ft_metadata".to_string(),
             args_base64: "e30=".parse().expect("valid base64"), // "{}"
-            request_type: "call_function".to_string(),
         })
         .await?;
 
