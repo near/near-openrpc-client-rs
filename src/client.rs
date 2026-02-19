@@ -232,6 +232,51 @@ impl NearRpcClient {
         self.call("gas_price", request).await
     }
 
+    // ── Query ────────────────────────────────────────────────────
+
+    /// Returns account information for a given account ID.
+    pub async fn view_account(
+        &self,
+        request: RpcViewAccountRequest,
+    ) -> Result<RpcViewAccountResponse> {
+        self.call("EXPERIMENTAL_view_account", request).await
+    }
+
+    /// Returns the contract code (Wasm binary) deployed to an account.
+    pub async fn view_code(&self, request: RpcViewCodeRequest) -> Result<RpcViewCodeResponse> {
+        self.call("EXPERIMENTAL_view_code", request).await
+    }
+
+    /// Returns contract state (key-value pairs) based on a key prefix.
+    pub async fn view_state(&self, request: RpcViewStateRequest) -> Result<RpcViewStateResponse> {
+        self.call("EXPERIMENTAL_view_state", request).await
+    }
+
+    /// Returns information about a single access key for an account.
+    pub async fn view_access_key(
+        &self,
+        request: RpcViewAccessKeyRequest,
+    ) -> Result<RpcViewAccessKeyResponse> {
+        self.call("EXPERIMENTAL_view_access_key", request).await
+    }
+
+    /// Returns all access keys for an account.
+    pub async fn view_access_key_list(
+        &self,
+        request: RpcViewAccessKeyListRequest,
+    ) -> Result<RpcViewAccessKeyListResponse> {
+        self.call("EXPERIMENTAL_view_access_key_list", request)
+            .await
+    }
+
+    /// Calls a view function on a contract and returns the result.
+    pub async fn call_function(
+        &self,
+        request: RpcCallFunctionRequest,
+    ) -> Result<RpcCallFunctionResponse> {
+        self.call("EXPERIMENTAL_call_function", request).await
+    }
+
     // ── Transactions ─────────────────────────────────────────────
 
     /// Sends a signed transaction asynchronously. Returns immediately with the transaction hash.
