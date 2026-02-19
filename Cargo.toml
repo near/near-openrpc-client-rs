@@ -18,6 +18,8 @@ chrono = { version = "0.4", features = ["serde"] }
 thiserror = "2"
 reqwest = { version = "0.13", default-features = false, features = ["json", "rustls"], optional = true }
 tokio = { version = "1", features = ["rt-multi-thread", "macros"], optional = true }
+near-token = { version = "0.3", optional = true }
+near-gas = { version = "0.3", optional = true }
 
 [build-dependencies]
 typify = "0.6"
@@ -28,3 +30,4 @@ prettyplease = "0.2"
 [features]
 default = ["client"]
 client = ["reqwest", "tokio"]
+near-primitives = ["near-token", "near-gas"]
