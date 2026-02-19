@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.NEARPROTOCOL_CI_PR_ACCESS }}
 
       - name: Fetch latest openrpc.json from nearcore
         run: |
@@ -42,6 +44,7 @@ jobs:
         if: steps.diff.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
+          token: ${{ secrets.NEARPROTOCOL_CI_PR_ACCESS }}
           branch: chore/sync-openrpc-spec
           commit-message: "chore: sync openrpc.json and regenerate types"
           title: "chore: sync openrpc.json and regenerate types"
