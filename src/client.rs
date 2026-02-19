@@ -232,13 +232,6 @@ impl NearRpcClient {
         self.call("gas_price", request).await
     }
 
-    // ── Query ────────────────────────────────────────────────────
-
-    /// Query the blockchain state (view account, view code, view state, call function, etc.)
-    pub async fn query(&self, request: RpcQueryRequest) -> Result<RpcQueryResponse> {
-        self.call("query", request).await
-    }
-
     // ── Transactions ─────────────────────────────────────────────
 
     /// Sends a signed transaction asynchronously. Returns immediately with the transaction hash.

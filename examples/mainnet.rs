@@ -46,51 +46,8 @@ async fn main() -> Result<()> {
     println!("   Gas price: {} yoctoNEAR", gas.gas_price);
     println!();
 
-    // 4. Query account
-    println!("4. Querying 'near' foundation account...");
-    let account_query = client
-        .query(RpcQueryRequest::ViewAccountFinality {
-            finality: Finality::Final,
-            account_id: "near".parse().expect("valid account id"),
-            request_type: "view_account".to_string(),
-        })
-        .await?;
-
-    if let RpcQueryResponse::AccountView {
-        amount,
-        storage_usage,
-        ..
-    } = account_query
-    {
-        let balance_str: String = amount.into();
-        let balance_yocto: u128 = balance_str.parse().unwrap_or(0);
-        let balance_near = balance_yocto / 10u128.pow(24);
-        println!("   Account: near");
-        println!("   Balance: {} NEAR", balance_near);
-        println!("   Storage used: {} bytes", storage_usage);
-    }
-    println!();
-
-    // 5. Call a view function
-    println!("5. Calling ft_metadata on wrap.near...");
-    let call_result = client
-        .query(RpcQueryRequest::CallFunctionFinality {
-            finality: Finality::Final,
-            account_id: "wrap.near".parse().expect("valid account id"),
-            method_name: "ft_metadata".to_string(),
-            args_base64: "e30=".parse().expect("valid base64"), // "{}"
-            request_type: "call_function".to_string(),
-        })
-        .await?;
-
-    if let RpcQueryResponse::CallResult { result, .. } = call_result {
-        let decoded = String::from_utf8(result).unwrap_or_default();
-        println!("   wNEAR metadata: {}", decoded);
-    }
-    println!();
-
-    // 6. Validators
-    println!("6. Fetching current validators...");
+    // 4. Validators
+    println!("4. Fetching current validators...");
     let validators = client.validators(RpcValidatorRequest::Latest).await?;
     println!(
         "   Current validators: {}",
@@ -105,8 +62,8 @@ async fn main() -> Result<()> {
     }
     println!();
 
-    // 7. Network info
-    println!("7. Fetching network info...");
+    // 5. Network info
+    println!("5. Fetching network info...");
     let network = client.network_info().await?;
     println!("   Active peers: {}", network.active_peers.len());
     println!("   Known producers: {}", network.known_producers.len());

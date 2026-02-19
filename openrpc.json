@@ -79,22 +79,6 @@
         "title": "AccessKeyInfoView",
         "type": "object"
       },
-      "AccessKeyList": {
-        "description": "Lists access keys",
-        "properties": {
-          "keys": {
-            "items": {
-              "$ref": "#/components/schemas/AccessKeyInfoView"
-            },
-            "type": "array"
-          }
-        },
-        "required": [
-          "keys"
-        ],
-        "title": "AccessKeyList",
-        "type": "object"
-      },
       "AccessKeyPermission": {
         "description": "Defines permissions for AccessKey",
         "oneOf": [
@@ -400,60 +384,6 @@
           "amount"
         ],
         "title": "AccountInfo",
-        "type": "object"
-      },
-      "AccountView": {
-        "description": "A view of the account",
-        "properties": {
-          "amount": {
-            "$ref": "#/components/schemas/NearToken"
-          },
-          "code_hash": {
-            "$ref": "#/components/schemas/CryptoHash"
-          },
-          "global_contract_account_id": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/AccountId"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "global_contract_hash": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/CryptoHash"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "locked": {
-            "$ref": "#/components/schemas/NearToken"
-          },
-          "storage_paid_at": {
-            "default": 0,
-            "description": "TODO(2271): deprecated.",
-            "format": "uint64",
-            "minimum": 0,
-            "type": "integer"
-          },
-          "storage_usage": {
-            "format": "uint64",
-            "minimum": 0,
-            "type": "integer"
-          }
-        },
-        "required": [
-          "amount",
-          "locked",
-          "code_hash",
-          "storage_usage"
-        ],
-        "title": "AccountView",
         "type": "object"
       },
       "AccountWithPublicKey": {
@@ -1192,6 +1122,43 @@
               "InsufficientGasKeyBalance"
             ],
             "title": "InsufficientGasKeyBalance",
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "description": "Gas key balance is too high to burn during deletion",
+            "properties": {
+              "GasKeyBalanceTooHigh": {
+                "properties": {
+                  "account_id": {
+                    "$ref": "#/components/schemas/AccountId"
+                  },
+                  "balance": {
+                    "$ref": "#/components/schemas/NearToken"
+                  },
+                  "public_key": {
+                    "description": "Set for DeleteKey (specific key), None for DeleteAccount (aggregate)",
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/PublicKey"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "account_id",
+                  "balance"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "GasKeyBalanceTooHigh"
+            ],
+            "title": "GasKeyBalanceTooHigh",
             "type": "object"
           }
         ],
@@ -2533,32 +2500,6 @@
         "title": "BlockStatusView",
         "type": "object"
       },
-      "CallResult": {
-        "description": "A result returned by contract method",
-        "properties": {
-          "logs": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "result": {
-            "items": {
-              "format": "uint8",
-              "maximum": 255,
-              "minimum": 0,
-              "type": "integer"
-            },
-            "type": "array"
-          }
-        },
-        "required": [
-          "result",
-          "logs"
-        ],
-        "title": "CallResult",
-        "type": "object"
-      },
       "CatchupStatusView": {
         "description": "Status of the [catchup](https://near.github.io/nearcore/architecture/how/sync.html#catchup) process",
         "properties": {
@@ -2695,6 +2636,17 @@
           },
           "prev_state_root": {
             "$ref": "#/components/schemas/CryptoHash"
+          },
+          "proposed_split": {
+            "description": "Proposed trie split for dynamic resharding\n`None`: field missing (`ShardChunkHeaderInnerV4` or earlier)\n`Some(None)`: field present, but not set (`ChunkHeaderInnerV5` or later)\n`Some(Some(split))`: field present and set",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/TrieSplit"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "rent_paid": {
             "allOf": [
@@ -2970,23 +2922,6 @@
           "allowed_shard"
         ],
         "title": "CongestionInfoView",
-        "type": "object"
-      },
-      "ContractCodeView": {
-        "description": "A view of the contract code.",
-        "properties": {
-          "code_base64": {
-            "type": "string"
-          },
-          "hash": {
-            "$ref": "#/components/schemas/CryptoHash"
-          }
-        },
-        "required": [
-          "code_base64",
-          "hash"
-        ],
-        "title": "ContractCodeView",
         "type": "object"
       },
       "CostGasUsed": {
@@ -3297,6 +3232,15 @@
         "title": "DeployGlobalContractAction",
         "type": "object"
       },
+      "DepositCostFailureReason": {
+        "description": "Reason why a gas key transaction failed at the deposit/account level.\nIn these cases, gas is still charged from the gas key.",
+        "enum": [
+          "NotEnoughBalance",
+          "LackBalanceForState"
+        ],
+        "title": "DepositCostFailureReason",
+        "type": "string"
+      },
       "DetailedDebugStatus": {
         "properties": {
           "block_production_delay_millis": {
@@ -3470,8 +3414,9 @@
       },
       "EpochSyncConfig": {
         "properties": {
-          "epoch_sync_horizon": {
-            "description": "This serves as two purposes: (1) the node will not epoch sync and instead resort to\nheader sync, if the genesis block is within this many blocks from the current block;\n(2) the node will reject an epoch sync proof if the provided proof is for an epoch\nthat is more than this many blocks behind the current block.",
+          "epoch_sync_horizon_num_epochs": {
+            "default": 4,
+            "description": "Number of epochs behind the network head beyond which the node will use\nepoch sync instead of header sync. Also the maximum age (in epochs) of\naccepted epoch sync proofs. At the consumption site, this is multiplied\nby epoch_length to get the horizon in blocks.",
             "format": "uint64",
             "minimum": 0,
             "type": "integer"
@@ -3486,7 +3431,6 @@
           }
         },
         "required": [
-          "epoch_sync_horizon",
           "timeout_for_epoch_sync"
         ],
         "title": "EpochSyncConfig",
@@ -6436,6 +6380,40 @@
             ],
             "title": "NotEnoughGasKeyBalance",
             "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "description": "Gas key transaction failed because the account could not cover the deposit cost.\nGas is still charged from the gas key in this case.",
+            "properties": {
+              "NotEnoughBalanceForDeposit": {
+                "properties": {
+                  "balance": {
+                    "$ref": "#/components/schemas/NearToken"
+                  },
+                  "cost": {
+                    "$ref": "#/components/schemas/NearToken"
+                  },
+                  "reason": {
+                    "$ref": "#/components/schemas/DepositCostFailureReason"
+                  },
+                  "signer_id": {
+                    "$ref": "#/components/schemas/AccountId"
+                  }
+                },
+                "required": [
+                  "signer_id",
+                  "balance",
+                  "cost",
+                  "reason"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "NotEnoughBalanceForDeposit"
+            ],
+            "title": "NotEnoughBalanceForDeposit",
+            "type": "object"
           }
         ],
         "title": "InvalidTxError"
@@ -7250,187 +7228,6 @@
         "title": "PublicKey",
         "type": "string"
       },
-      "QueryRequest": {
-        "oneOf": [
-          {
-            "properties": {
-              "account_id": {
-                "$ref": "#/components/schemas/AccountId"
-              },
-              "request_type": {
-                "const": "view_account",
-                "type": "string"
-              }
-            },
-            "required": [
-              "account_id",
-              "request_type"
-            ],
-            "title": "ViewAccount",
-            "type": "object"
-          },
-          {
-            "properties": {
-              "account_id": {
-                "$ref": "#/components/schemas/AccountId"
-              },
-              "request_type": {
-                "const": "view_code",
-                "type": "string"
-              }
-            },
-            "required": [
-              "account_id",
-              "request_type"
-            ],
-            "title": "ViewCode",
-            "type": "object"
-          },
-          {
-            "properties": {
-              "account_id": {
-                "$ref": "#/components/schemas/AccountId"
-              },
-              "include_proof": {
-                "type": "boolean"
-              },
-              "prefix_base64": {
-                "$ref": "#/components/schemas/StoreKey"
-              },
-              "request_type": {
-                "const": "view_state",
-                "type": "string"
-              }
-            },
-            "required": [
-              "account_id",
-              "prefix_base64",
-              "request_type"
-            ],
-            "title": "ViewState",
-            "type": "object"
-          },
-          {
-            "properties": {
-              "account_id": {
-                "$ref": "#/components/schemas/AccountId"
-              },
-              "public_key": {
-                "$ref": "#/components/schemas/PublicKey"
-              },
-              "request_type": {
-                "const": "view_access_key",
-                "type": "string"
-              }
-            },
-            "required": [
-              "account_id",
-              "public_key",
-              "request_type"
-            ],
-            "title": "ViewAccessKey",
-            "type": "object"
-          },
-          {
-            "properties": {
-              "account_id": {
-                "$ref": "#/components/schemas/AccountId"
-              },
-              "request_type": {
-                "const": "view_access_key_list",
-                "type": "string"
-              }
-            },
-            "required": [
-              "account_id",
-              "request_type"
-            ],
-            "title": "ViewAccessKeyList",
-            "type": "object"
-          },
-          {
-            "properties": {
-              "account_id": {
-                "$ref": "#/components/schemas/AccountId"
-              },
-              "public_key": {
-                "$ref": "#/components/schemas/PublicKey"
-              },
-              "request_type": {
-                "const": "view_gas_key_nonces",
-                "type": "string"
-              }
-            },
-            "required": [
-              "account_id",
-              "public_key",
-              "request_type"
-            ],
-            "title": "ViewGasKeyNonces",
-            "type": "object"
-          },
-          {
-            "properties": {
-              "account_id": {
-                "$ref": "#/components/schemas/AccountId"
-              },
-              "args_base64": {
-                "$ref": "#/components/schemas/FunctionArgs"
-              },
-              "method_name": {
-                "type": "string"
-              },
-              "request_type": {
-                "const": "call_function",
-                "type": "string"
-              }
-            },
-            "required": [
-              "account_id",
-              "args_base64",
-              "method_name",
-              "request_type"
-            ],
-            "title": "CallFunction",
-            "type": "object"
-          },
-          {
-            "properties": {
-              "code_hash": {
-                "$ref": "#/components/schemas/CryptoHash"
-              },
-              "request_type": {
-                "const": "view_global_contract_code",
-                "type": "string"
-              }
-            },
-            "required": [
-              "code_hash",
-              "request_type"
-            ],
-            "title": "ViewGlobalContractCode",
-            "type": "object"
-          },
-          {
-            "properties": {
-              "account_id": {
-                "$ref": "#/components/schemas/AccountId"
-              },
-              "request_type": {
-                "const": "view_global_contract_code_by_account_id",
-                "type": "string"
-              }
-            },
-            "required": [
-              "account_id",
-              "request_type"
-            ],
-            "title": "ViewGlobalContractCodeByAccountId",
-            "type": "object"
-          }
-        ],
-        "title": "QueryRequest"
-      },
       "ReceiptEnumView": {
         "oneOf": [
           {
@@ -7545,6 +7342,14 @@
                   },
                   "id": {
                     "$ref": "#/components/schemas/GlobalContractIdentifier"
+                  },
+                  "nonce": {
+                    "format": "uint64",
+                    "minimum": 0,
+                    "type": [
+                      "integer",
+                      "null"
+                    ]
                   },
                   "target_shard": {
                     "$ref": "#/components/schemas/ShardId"
@@ -7887,6 +7692,120 @@
           "chunks"
         ],
         "title": "RpcBlockResponse",
+        "type": "object"
+      },
+      "RpcCallFunctionRequest": {
+        "oneOf": [
+          {
+            "properties": {
+              "account_id": {
+                "$ref": "#/components/schemas/AccountId"
+              },
+              "args_base64": {
+                "$ref": "#/components/schemas/FunctionArgs"
+              },
+              "block_id": {
+                "$ref": "#/components/schemas/BlockId"
+              },
+              "method_name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "block_id",
+              "account_id",
+              "method_name",
+              "args_base64"
+            ],
+            "title": "BlockIdAccountId",
+            "type": "object"
+          },
+          {
+            "properties": {
+              "account_id": {
+                "$ref": "#/components/schemas/AccountId"
+              },
+              "args_base64": {
+                "$ref": "#/components/schemas/FunctionArgs"
+              },
+              "finality": {
+                "$ref": "#/components/schemas/Finality"
+              },
+              "method_name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "finality",
+              "account_id",
+              "method_name",
+              "args_base64"
+            ],
+            "title": "FinalityAccountId",
+            "type": "object"
+          },
+          {
+            "properties": {
+              "account_id": {
+                "$ref": "#/components/schemas/AccountId"
+              },
+              "args_base64": {
+                "$ref": "#/components/schemas/FunctionArgs"
+              },
+              "method_name": {
+                "type": "string"
+              },
+              "sync_checkpoint": {
+                "$ref": "#/components/schemas/SyncCheckpoint"
+              }
+            },
+            "required": [
+              "sync_checkpoint",
+              "account_id",
+              "method_name",
+              "args_base64"
+            ],
+            "title": "SyncCheckpointAccountId",
+            "type": "object"
+          }
+        ],
+        "title": "RpcCallFunctionRequest",
+        "type": "object"
+      },
+      "RpcCallFunctionResponse": {
+        "description": "A result returned by contract method",
+        "properties": {
+          "block_hash": {
+            "$ref": "#/components/schemas/CryptoHash"
+          },
+          "block_height": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "logs": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "result": {
+            "items": {
+              "format": "uint8",
+              "maximum": 255,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "result",
+          "logs",
+          "block_height",
+          "block_hash"
+        ],
+        "title": "RpcCallFunctionResponse",
         "type": "object"
       },
       "RpcChunkRequest": {
@@ -9239,204 +9158,6 @@
         "title": "RpcProtocolConfigResponse",
         "type": "object"
       },
-      "RpcQueryRequest": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/BlockReference"
-          },
-          {
-            "$ref": "#/components/schemas/QueryRequest"
-          }
-        ],
-        "title": "RpcQueryRequest",
-        "type": "object"
-      },
-      "RpcQueryResponse": {
-        "oneOf": [
-          {
-            "allOf": [
-              {
-                "properties": {
-                  "block_hash": {
-                    "$ref": "#/components/schemas/CryptoHash"
-                  },
-                  "block_height": {
-                    "format": "uint64",
-                    "minimum": 0,
-                    "type": "integer"
-                  }
-                },
-                "required": [
-                  "block_height",
-                  "block_hash"
-                ],
-                "type": "object"
-              },
-              {
-                "$ref": "#/components/schemas/AccountView"
-              }
-            ],
-            "title": "AccountView"
-          },
-          {
-            "allOf": [
-              {
-                "properties": {
-                  "block_hash": {
-                    "$ref": "#/components/schemas/CryptoHash"
-                  },
-                  "block_height": {
-                    "format": "uint64",
-                    "minimum": 0,
-                    "type": "integer"
-                  }
-                },
-                "required": [
-                  "block_height",
-                  "block_hash"
-                ],
-                "type": "object"
-              },
-              {
-                "$ref": "#/components/schemas/ContractCodeView"
-              }
-            ],
-            "title": "ContractCodeView"
-          },
-          {
-            "allOf": [
-              {
-                "properties": {
-                  "block_hash": {
-                    "$ref": "#/components/schemas/CryptoHash"
-                  },
-                  "block_height": {
-                    "format": "uint64",
-                    "minimum": 0,
-                    "type": "integer"
-                  }
-                },
-                "required": [
-                  "block_height",
-                  "block_hash"
-                ],
-                "type": "object"
-              },
-              {
-                "$ref": "#/components/schemas/ViewStateResult"
-              }
-            ],
-            "title": "ViewStateResult"
-          },
-          {
-            "allOf": [
-              {
-                "properties": {
-                  "block_hash": {
-                    "$ref": "#/components/schemas/CryptoHash"
-                  },
-                  "block_height": {
-                    "format": "uint64",
-                    "minimum": 0,
-                    "type": "integer"
-                  }
-                },
-                "required": [
-                  "block_height",
-                  "block_hash"
-                ],
-                "type": "object"
-              },
-              {
-                "$ref": "#/components/schemas/CallResult"
-              }
-            ],
-            "title": "CallResult"
-          },
-          {
-            "allOf": [
-              {
-                "properties": {
-                  "block_hash": {
-                    "$ref": "#/components/schemas/CryptoHash"
-                  },
-                  "block_height": {
-                    "format": "uint64",
-                    "minimum": 0,
-                    "type": "integer"
-                  }
-                },
-                "required": [
-                  "block_height",
-                  "block_hash"
-                ],
-                "type": "object"
-              },
-              {
-                "$ref": "#/components/schemas/AccessKeyView"
-              }
-            ],
-            "title": "AccessKeyView"
-          },
-          {
-            "allOf": [
-              {
-                "properties": {
-                  "block_hash": {
-                    "$ref": "#/components/schemas/CryptoHash"
-                  },
-                  "block_height": {
-                    "format": "uint64",
-                    "minimum": 0,
-                    "type": "integer"
-                  }
-                },
-                "required": [
-                  "block_height",
-                  "block_hash"
-                ],
-                "type": "object"
-              },
-              {
-                "$ref": "#/components/schemas/AccessKeyList"
-              }
-            ],
-            "title": "AccessKeyList"
-          },
-          {
-            "allOf": [
-              {
-                "properties": {
-                  "block_hash": {
-                    "$ref": "#/components/schemas/CryptoHash"
-                  },
-                  "block_height": {
-                    "format": "uint64",
-                    "minimum": 0,
-                    "type": "integer"
-                  }
-                },
-                "required": [
-                  "block_height",
-                  "block_hash"
-                ],
-                "type": "object"
-              },
-              {
-                "items": {
-                  "format": "uint64",
-                  "minimum": 0,
-                  "type": "integer"
-                },
-                "type": "array"
-              }
-            ],
-            "title": "BlockHeightBlockHash"
-          }
-        ],
-        "title": "RpcQueryResponse",
-        "type": "object"
-      },
       "RpcReceiptRequest": {
         "properties": {
           "receipt_id": {
@@ -10017,6 +9738,490 @@
           }
         },
         "title": "RpcValidatorsOrderedRequest",
+        "type": "object"
+      },
+      "RpcViewAccessKeyListRequest": {
+        "oneOf": [
+          {
+            "properties": {
+              "account_id": {
+                "$ref": "#/components/schemas/AccountId"
+              },
+              "block_id": {
+                "$ref": "#/components/schemas/BlockId"
+              }
+            },
+            "required": [
+              "block_id",
+              "account_id"
+            ],
+            "title": "BlockIdAccountId",
+            "type": "object"
+          },
+          {
+            "properties": {
+              "account_id": {
+                "$ref": "#/components/schemas/AccountId"
+              },
+              "finality": {
+                "$ref": "#/components/schemas/Finality"
+              }
+            },
+            "required": [
+              "finality",
+              "account_id"
+            ],
+            "title": "FinalityAccountId",
+            "type": "object"
+          },
+          {
+            "properties": {
+              "account_id": {
+                "$ref": "#/components/schemas/AccountId"
+              },
+              "sync_checkpoint": {
+                "$ref": "#/components/schemas/SyncCheckpoint"
+              }
+            },
+            "required": [
+              "sync_checkpoint",
+              "account_id"
+            ],
+            "title": "SyncCheckpointAccountId",
+            "type": "object"
+          }
+        ],
+        "title": "RpcViewAccessKeyListRequest",
+        "type": "object"
+      },
+      "RpcViewAccessKeyListResponse": {
+        "description": "Lists access keys",
+        "properties": {
+          "block_hash": {
+            "$ref": "#/components/schemas/CryptoHash"
+          },
+          "block_height": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "keys": {
+            "items": {
+              "$ref": "#/components/schemas/AccessKeyInfoView"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "keys",
+          "block_height",
+          "block_hash"
+        ],
+        "title": "RpcViewAccessKeyListResponse",
+        "type": "object"
+      },
+      "RpcViewAccessKeyRequest": {
+        "oneOf": [
+          {
+            "properties": {
+              "account_id": {
+                "$ref": "#/components/schemas/AccountId"
+              },
+              "block_id": {
+                "$ref": "#/components/schemas/BlockId"
+              },
+              "public_key": {
+                "$ref": "#/components/schemas/PublicKey"
+              }
+            },
+            "required": [
+              "block_id",
+              "account_id",
+              "public_key"
+            ],
+            "title": "BlockIdAccountId",
+            "type": "object"
+          },
+          {
+            "properties": {
+              "account_id": {
+                "$ref": "#/components/schemas/AccountId"
+              },
+              "finality": {
+                "$ref": "#/components/schemas/Finality"
+              },
+              "public_key": {
+                "$ref": "#/components/schemas/PublicKey"
+              }
+            },
+            "required": [
+              "finality",
+              "account_id",
+              "public_key"
+            ],
+            "title": "FinalityAccountId",
+            "type": "object"
+          },
+          {
+            "properties": {
+              "account_id": {
+                "$ref": "#/components/schemas/AccountId"
+              },
+              "public_key": {
+                "$ref": "#/components/schemas/PublicKey"
+              },
+              "sync_checkpoint": {
+                "$ref": "#/components/schemas/SyncCheckpoint"
+              }
+            },
+            "required": [
+              "sync_checkpoint",
+              "account_id",
+              "public_key"
+            ],
+            "title": "SyncCheckpointAccountId",
+            "type": "object"
+          }
+        ],
+        "title": "RpcViewAccessKeyRequest",
+        "type": "object"
+      },
+      "RpcViewAccessKeyResponse": {
+        "description": "Describes access key permission scope and nonce.",
+        "properties": {
+          "block_hash": {
+            "$ref": "#/components/schemas/CryptoHash"
+          },
+          "block_height": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "nonce": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "permission": {
+            "$ref": "#/components/schemas/AccessKeyPermissionView"
+          }
+        },
+        "required": [
+          "nonce",
+          "permission",
+          "block_height",
+          "block_hash"
+        ],
+        "title": "RpcViewAccessKeyResponse",
+        "type": "object"
+      },
+      "RpcViewAccountRequest": {
+        "oneOf": [
+          {
+            "properties": {
+              "account_id": {
+                "$ref": "#/components/schemas/AccountId"
+              },
+              "block_id": {
+                "$ref": "#/components/schemas/BlockId"
+              }
+            },
+            "required": [
+              "block_id",
+              "account_id"
+            ],
+            "title": "BlockIdAccountId",
+            "type": "object"
+          },
+          {
+            "properties": {
+              "account_id": {
+                "$ref": "#/components/schemas/AccountId"
+              },
+              "finality": {
+                "$ref": "#/components/schemas/Finality"
+              }
+            },
+            "required": [
+              "finality",
+              "account_id"
+            ],
+            "title": "FinalityAccountId",
+            "type": "object"
+          },
+          {
+            "properties": {
+              "account_id": {
+                "$ref": "#/components/schemas/AccountId"
+              },
+              "sync_checkpoint": {
+                "$ref": "#/components/schemas/SyncCheckpoint"
+              }
+            },
+            "required": [
+              "sync_checkpoint",
+              "account_id"
+            ],
+            "title": "SyncCheckpointAccountId",
+            "type": "object"
+          }
+        ],
+        "title": "RpcViewAccountRequest",
+        "type": "object"
+      },
+      "RpcViewAccountResponse": {
+        "description": "A view of the account",
+        "properties": {
+          "amount": {
+            "$ref": "#/components/schemas/NearToken"
+          },
+          "block_hash": {
+            "$ref": "#/components/schemas/CryptoHash"
+          },
+          "block_height": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "code_hash": {
+            "$ref": "#/components/schemas/CryptoHash"
+          },
+          "global_contract_account_id": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/AccountId"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "global_contract_hash": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CryptoHash"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "locked": {
+            "$ref": "#/components/schemas/NearToken"
+          },
+          "storage_paid_at": {
+            "default": 0,
+            "description": "TODO(2271): deprecated.",
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "storage_usage": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "amount",
+          "locked",
+          "code_hash",
+          "storage_usage",
+          "block_height",
+          "block_hash"
+        ],
+        "title": "RpcViewAccountResponse",
+        "type": "object"
+      },
+      "RpcViewCodeRequest": {
+        "oneOf": [
+          {
+            "properties": {
+              "account_id": {
+                "$ref": "#/components/schemas/AccountId"
+              },
+              "block_id": {
+                "$ref": "#/components/schemas/BlockId"
+              }
+            },
+            "required": [
+              "block_id",
+              "account_id"
+            ],
+            "title": "BlockIdAccountId",
+            "type": "object"
+          },
+          {
+            "properties": {
+              "account_id": {
+                "$ref": "#/components/schemas/AccountId"
+              },
+              "finality": {
+                "$ref": "#/components/schemas/Finality"
+              }
+            },
+            "required": [
+              "finality",
+              "account_id"
+            ],
+            "title": "FinalityAccountId",
+            "type": "object"
+          },
+          {
+            "properties": {
+              "account_id": {
+                "$ref": "#/components/schemas/AccountId"
+              },
+              "sync_checkpoint": {
+                "$ref": "#/components/schemas/SyncCheckpoint"
+              }
+            },
+            "required": [
+              "sync_checkpoint",
+              "account_id"
+            ],
+            "title": "SyncCheckpointAccountId",
+            "type": "object"
+          }
+        ],
+        "title": "RpcViewCodeRequest",
+        "type": "object"
+      },
+      "RpcViewCodeResponse": {
+        "description": "A view of the contract code.",
+        "properties": {
+          "block_hash": {
+            "$ref": "#/components/schemas/CryptoHash"
+          },
+          "block_height": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "code_base64": {
+            "type": "string"
+          },
+          "hash": {
+            "$ref": "#/components/schemas/CryptoHash"
+          }
+        },
+        "required": [
+          "code_base64",
+          "hash",
+          "block_height",
+          "block_hash"
+        ],
+        "title": "RpcViewCodeResponse",
+        "type": "object"
+      },
+      "RpcViewStateRequest": {
+        "oneOf": [
+          {
+            "properties": {
+              "account_id": {
+                "$ref": "#/components/schemas/AccountId"
+              },
+              "block_id": {
+                "$ref": "#/components/schemas/BlockId"
+              },
+              "include_proof": {
+                "default": false,
+                "type": "boolean"
+              },
+              "prefix_base64": {
+                "$ref": "#/components/schemas/StoreKey"
+              }
+            },
+            "required": [
+              "block_id",
+              "account_id",
+              "prefix_base64"
+            ],
+            "title": "BlockIdAccountId",
+            "type": "object"
+          },
+          {
+            "properties": {
+              "account_id": {
+                "$ref": "#/components/schemas/AccountId"
+              },
+              "finality": {
+                "$ref": "#/components/schemas/Finality"
+              },
+              "include_proof": {
+                "default": false,
+                "type": "boolean"
+              },
+              "prefix_base64": {
+                "$ref": "#/components/schemas/StoreKey"
+              }
+            },
+            "required": [
+              "finality",
+              "account_id",
+              "prefix_base64"
+            ],
+            "title": "FinalityAccountId",
+            "type": "object"
+          },
+          {
+            "properties": {
+              "account_id": {
+                "$ref": "#/components/schemas/AccountId"
+              },
+              "include_proof": {
+                "default": false,
+                "type": "boolean"
+              },
+              "prefix_base64": {
+                "$ref": "#/components/schemas/StoreKey"
+              },
+              "sync_checkpoint": {
+                "$ref": "#/components/schemas/SyncCheckpoint"
+              }
+            },
+            "required": [
+              "sync_checkpoint",
+              "account_id",
+              "prefix_base64"
+            ],
+            "title": "SyncCheckpointAccountId",
+            "type": "object"
+          }
+        ],
+        "title": "RpcViewStateRequest",
+        "type": "object"
+      },
+      "RpcViewStateResponse": {
+        "description": "Resulting state values for a view state query request",
+        "properties": {
+          "block_hash": {
+            "$ref": "#/components/schemas/CryptoHash"
+          },
+          "block_height": {
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "proof": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "values": {
+            "items": {
+              "$ref": "#/components/schemas/StateItem"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "values",
+          "block_height",
+          "block_hash"
+        ],
+        "title": "RpcViewStateResponse",
         "type": "object"
       },
       "RuntimeConfigView": {
@@ -11697,6 +11902,38 @@
         "title": "TransferToGasKeyAction",
         "type": "object"
       },
+      "TrieSplit": {
+        "description": "The result of splitting a memtrie into two possibly even parts, according to `memory_usage`\nstored in the trie nodes.\n\n**NOTE: This is an artificial value calculated according to `TRIE_COST`. Hence, it does not\nrepresent actual memory allocation, but the split ratio should be roughly consistent with that.**",
+        "properties": {
+          "boundary_account": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AccountId"
+              }
+            ],
+            "description": "Account ID representing the split path"
+          },
+          "left_memory": {
+            "description": "Total `memory_usage` of the left part (excluding the split path)",
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "right_memory": {
+            "description": "Total `memory_usage` of the right part (including the split path)",
+            "format": "uint64",
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "boundary_account",
+          "left_memory",
+          "right_memory"
+        ],
+        "title": "TrieSplit",
+        "type": "object"
+      },
       "TxExecutionError": {
         "description": "Error returned in the ExecutionOutcome in case of failure",
         "oneOf": [
@@ -11793,6 +12030,10 @@
             "description": "See [VMConfig::eth_implicit_accounts](crate::vm::Config::eth_implicit_accounts).",
             "type": "boolean"
           },
+          "eth_implicit_global_contract": {
+            "description": "See [VMConfig::eth_implicit_global_contract](crate::vm::Config::eth_implicit_global_contract).",
+            "type": "boolean"
+          },
           "ext_costs": {
             "allOf": [
               {
@@ -11881,6 +12122,7 @@
           "fix_contract_loading_cost",
           "implicit_account_creation",
           "eth_implicit_accounts",
+          "eth_implicit_global_contract",
           "limit_config"
         ],
         "title": "VMConfigView",
@@ -12181,28 +12423,6 @@
         "title": "Version",
         "type": "object"
       },
-      "ViewStateResult": {
-        "description": "Resulting state values for a view state query request",
-        "properties": {
-          "proof": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "values": {
-            "items": {
-              "$ref": "#/components/schemas/StateItem"
-            },
-            "type": "array"
-          }
-        },
-        "required": [
-          "values"
-        ],
-        "title": "ViewStateResult",
-        "type": "object"
-      },
       "WasmTrap": {
         "description": "A kind of a trap happened during execution of a binary",
         "oneOf": [
@@ -12255,7 +12475,7 @@
         "title": "WasmTrap"
       },
       "WithdrawFromGasKeyAction": {
-        "description": "Withdraw NEAR from a gas key's balance to the account",
+        "description": "Withdraw NEAR from a gas key's balance to the account.\n\nThis action must only be available via transactions, not via contract execution\n(there is no corresponding promise batch action host function).",
         "properties": {
           "amount": {
             "allOf": [
@@ -12402,32 +12622,6 @@
       "tags": [
         {
           "name": "gas"
-        }
-      ]
-    },
-    {
-      "name": "query",
-      "paramStructure": "by-name",
-      "params": [
-        {
-          "description": "Request parameters for query",
-          "name": "request",
-          "required": true,
-          "schema": {
-            "$ref": "#/components/schemas/RpcQueryRequest"
-          }
-        }
-      ],
-      "result": {
-        "name": "result",
-        "schema": {
-          "$ref": "#/components/schemas/RpcQueryResponse"
-        }
-      },
-      "summary": "Query the blockchain state (view account, call function, etc.)",
-      "tags": [
-        {
-          "name": "query"
         }
       ]
     },
@@ -13036,6 +13230,180 @@
       "tags": [
         {
           "name": "light_client"
+        },
+        {
+          "name": "experimental"
+        }
+      ]
+    },
+    {
+      "name": "EXPERIMENTAL_view_account",
+      "paramStructure": "by-name",
+      "params": [
+        {
+          "description": "Request parameters for EXPERIMENTAL_view_account",
+          "name": "request",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/RpcViewAccountRequest"
+          }
+        }
+      ],
+      "result": {
+        "name": "result",
+        "schema": {
+          "$ref": "#/components/schemas/RpcViewAccountResponse"
+        }
+      },
+      "summary": "Returns information about an account for given account_id",
+      "tags": [
+        {
+          "name": "query"
+        },
+        {
+          "name": "experimental"
+        }
+      ]
+    },
+    {
+      "name": "EXPERIMENTAL_view_code",
+      "paramStructure": "by-name",
+      "params": [
+        {
+          "description": "Request parameters for EXPERIMENTAL_view_code",
+          "name": "request",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/RpcViewCodeRequest"
+          }
+        }
+      ],
+      "result": {
+        "name": "result",
+        "schema": {
+          "$ref": "#/components/schemas/RpcViewCodeResponse"
+        }
+      },
+      "summary": "Returns the contract code (Wasm binary) deployed to the account",
+      "tags": [
+        {
+          "name": "query"
+        },
+        {
+          "name": "experimental"
+        }
+      ]
+    },
+    {
+      "name": "EXPERIMENTAL_view_state",
+      "paramStructure": "by-name",
+      "params": [
+        {
+          "description": "Request parameters for EXPERIMENTAL_view_state",
+          "name": "request",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/RpcViewStateRequest"
+          }
+        }
+      ],
+      "result": {
+        "name": "result",
+        "schema": {
+          "$ref": "#/components/schemas/RpcViewStateResponse"
+        }
+      },
+      "summary": "Returns the state (key-value pairs) of a contract based on the key prefix",
+      "tags": [
+        {
+          "name": "query"
+        },
+        {
+          "name": "experimental"
+        }
+      ]
+    },
+    {
+      "name": "EXPERIMENTAL_view_access_key",
+      "paramStructure": "by-name",
+      "params": [
+        {
+          "description": "Request parameters for EXPERIMENTAL_view_access_key",
+          "name": "request",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/RpcViewAccessKeyRequest"
+          }
+        }
+      ],
+      "result": {
+        "name": "result",
+        "schema": {
+          "$ref": "#/components/schemas/RpcViewAccessKeyResponse"
+        }
+      },
+      "summary": "Returns information about a single access key for given account",
+      "tags": [
+        {
+          "name": "query"
+        },
+        {
+          "name": "experimental"
+        }
+      ]
+    },
+    {
+      "name": "EXPERIMENTAL_view_access_key_list",
+      "paramStructure": "by-name",
+      "params": [
+        {
+          "description": "Request parameters for EXPERIMENTAL_view_access_key_list",
+          "name": "request",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/RpcViewAccessKeyListRequest"
+          }
+        }
+      ],
+      "result": {
+        "name": "result",
+        "schema": {
+          "$ref": "#/components/schemas/RpcViewAccessKeyListResponse"
+        }
+      },
+      "summary": "Returns all access keys for a given account",
+      "tags": [
+        {
+          "name": "query"
+        },
+        {
+          "name": "experimental"
+        }
+      ]
+    },
+    {
+      "name": "EXPERIMENTAL_call_function",
+      "paramStructure": "by-name",
+      "params": [
+        {
+          "description": "Request parameters for EXPERIMENTAL_call_function",
+          "name": "request",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/RpcCallFunctionRequest"
+          }
+        }
+      ],
+      "result": {
+        "name": "result",
+        "schema": {
+          "$ref": "#/components/schemas/RpcCallFunctionResponse"
+        }
+      },
+      "summary": "Calls a view function on a contract and returns the result",
+      "tags": [
+        {
+          "name": "query"
         },
         {
           "name": "experimental"

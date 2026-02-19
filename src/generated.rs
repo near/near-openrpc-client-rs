@@ -63,12 +63,6 @@ pub struct AccessKeyInfoView {
     pub access_key: AccessKeyView,
     pub public_key: PublicKey,
 }
-///Lists access keys
-///
-#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
-pub struct AccessKeyList {
-    pub keys: ::std::vec::Vec<AccessKeyInfoView>,
-}
 ///Defines permissions for AccessKey
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
@@ -273,22 +267,6 @@ pub struct AccountInfo {
     pub amount: NearToken,
     pub public_key: PublicKey,
 }
-///A view of the account
-///
-#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
-pub struct AccountView {
-    pub amount: NearToken,
-    pub code_hash: CryptoHash,
-    #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
-    pub global_contract_account_id: ::std::option::Option<AccountId>,
-    #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
-    pub global_contract_hash: ::std::option::Option<CryptoHash>,
-    pub locked: NearToken,
-    ///TODO(2271): deprecated.
-    #[serde(default)]
-    pub storage_paid_at: u64,
-    pub storage_usage: u64,
-}
 ///Account ID with its public key.
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
@@ -420,6 +398,14 @@ TODO(#8598): This error is named very poorly. A better name would be
         balance: NearToken,
         public_key: PublicKey,
         required: NearToken,
+    },
+    ///Gas key balance is too high to burn during deletion
+    GasKeyBalanceTooHigh {
+        account_id: AccountId,
+        balance: NearToken,
+        ///Set for DeleteKey (specific key), None for DeleteAccount (aggregate)
+        #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
+        public_key: ::std::option::Option<PublicKey>,
     },
 }
 impl ::std::convert::From<FunctionCallError> for ActionErrorKind {
@@ -719,13 +705,6 @@ pub struct BlockStatusView {
     pub hash: CryptoHash,
     pub height: u64,
 }
-///A result returned by contract method
-///
-#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
-pub struct CallResult {
-    pub logs: ::std::vec::Vec<::std::string::String>,
-    pub result: ::std::vec::Vec<u8>,
-}
 ///Status of the [catchup](https://near.github.io/nearcore/architecture/how/sync.html#catchup) process
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
@@ -845,6 +824,12 @@ pub struct ChunkHeaderView {
     pub outgoing_receipts_root: CryptoHash,
     pub prev_block_hash: CryptoHash,
     pub prev_state_root: CryptoHash,
+    /**Proposed trie split for dynamic resharding
+`None`: field missing (`ShardChunkHeaderInnerV4` or earlier)
+`Some(None)`: field present, but not set (`ChunkHeaderInnerV5` or later)
+`Some(Some(split))`: field present and set*/
+    #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
+    pub proposed_split: ::std::option::Option<TrieSplit>,
     ///TODO(2271): deprecated.
     #[serde(default = "defaults::chunk_header_view_rent_paid")]
     pub rent_paid: NearToken,
@@ -954,13 +939,6 @@ pub struct CongestionInfoView {
     pub buffered_receipts_gas: ::std::string::String,
     pub delayed_receipts_gas: ::std::string::String,
     pub receipt_bytes: u64,
-}
-///A view of the contract code.
-///
-#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
-pub struct ContractCodeView {
-    pub code_base64: ::std::string::String,
-    pub hash: CryptoHash,
 }
 ///Shows gas profile. More info [here](https://near.github.io/nearcore/architecture/gas/gas_profile.html?highlight=WASM_HOST_COST#example-transaction-gas-profile).
 ///
@@ -1151,6 +1129,69 @@ pub struct DeployGlobalContractAction {
     pub code: ::std::string::String,
     pub deploy_mode: GlobalContractDeployMode,
 }
+/**Reason why a gas key transaction failed at the deposit/account level.
+In these cases, gas is still charged from the gas key.*/
+///
+#[derive(
+    ::serde::Deserialize,
+    ::serde::Serialize,
+    Clone,
+    Copy,
+    Debug,
+    Eq,
+    Hash,
+    Ord,
+    PartialEq,
+    PartialOrd
+)]
+pub enum DepositCostFailureReason {
+    NotEnoughBalance,
+    LackBalanceForState,
+}
+impl ::std::fmt::Display for DepositCostFailureReason {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        match *self {
+            Self::NotEnoughBalance => f.write_str("NotEnoughBalance"),
+            Self::LackBalanceForState => f.write_str("LackBalanceForState"),
+        }
+    }
+}
+impl ::std::str::FromStr for DepositCostFailureReason {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        match value {
+            "NotEnoughBalance" => Ok(Self::NotEnoughBalance),
+            "LackBalanceForState" => Ok(Self::LackBalanceForState),
+            _ => Err("invalid value".into()),
+        }
+    }
+}
+impl ::std::convert::TryFrom<&str> for DepositCostFailureReason {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+impl ::std::convert::TryFrom<&::std::string::String> for DepositCostFailureReason {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for DepositCostFailureReason {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
 ///`DetailedDebugStatus`
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
@@ -1325,11 +1366,12 @@ impl ::std::fmt::Display for EpochId {
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
 pub struct EpochSyncConfig {
-    /**This serves as two purposes: (1) the node will not epoch sync and instead resort to
-header sync, if the genesis block is within this many blocks from the current block;
-(2) the node will reject an epoch sync proof if the provided proof is for an epoch
-that is more than this many blocks behind the current block.*/
-    pub epoch_sync_horizon: u64,
+    /**Number of epochs behind the network head beyond which the node will use
+epoch sync instead of header sync. Also the maximum age (in epochs) of
+accepted epoch sync proofs. At the consumption site, this is multiplied
+by epoch_length to get the horizon in blocks.*/
+    #[serde(default = "defaults::default_u64::<u64, 4>")]
+    pub epoch_sync_horizon_num_epochs: u64,
     /**Timeout for epoch sync requests. The node will continue retrying indefinitely even
 if this timeout is exceeded.*/
     pub timeout_for_epoch_sync: DurationAsStdSchemaProvider,
@@ -2300,6 +2342,14 @@ must have a nonce_index in valid range, regular transactions must not.*/
     },
     ///Gas key does not have enough balance to cover gas costs.
     NotEnoughGasKeyBalance { balance: NearToken, cost: NearToken, signer_id: AccountId },
+    /**Gas key transaction failed because the account could not cover the deposit cost.
+Gas is still charged from the gas key in this case.*/
+    NotEnoughBalanceForDeposit {
+        balance: NearToken,
+        cost: NearToken,
+        reason: DepositCostFailureReason,
+        signer_id: AccountId,
+    },
 }
 impl ::std::convert::From<InvalidAccessKeyError> for InvalidTxError {
     fn from(value: InvalidAccessKeyError) -> Self {
@@ -3145,48 +3195,6 @@ impl ::std::fmt::Display for PublicKey {
         self.0.fmt(f)
     }
 }
-///`QueryRequest`
-///
-#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
-#[serde(tag = "request_type")]
-pub enum QueryRequest {
-    ///ViewAccount
-    #[serde(rename = "view_account")]
-    ViewAccount { account_id: AccountId },
-    ///ViewCode
-    #[serde(rename = "view_code")]
-    ViewCode { account_id: AccountId },
-    ///ViewState
-    #[serde(rename = "view_state")]
-    ViewState {
-        account_id: AccountId,
-        #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
-        include_proof: ::std::option::Option<bool>,
-        prefix_base64: StoreKey,
-    },
-    ///ViewAccessKey
-    #[serde(rename = "view_access_key")]
-    ViewAccessKey { account_id: AccountId, public_key: PublicKey },
-    ///ViewAccessKeyList
-    #[serde(rename = "view_access_key_list")]
-    ViewAccessKeyList { account_id: AccountId },
-    ///ViewGasKeyNonces
-    #[serde(rename = "view_gas_key_nonces")]
-    ViewGasKeyNonces { account_id: AccountId, public_key: PublicKey },
-    ///CallFunction
-    #[serde(rename = "call_function")]
-    CallFunction {
-        account_id: AccountId,
-        args_base64: FunctionArgs,
-        method_name: ::std::string::String,
-    },
-    ///ViewGlobalContractCode
-    #[serde(rename = "view_global_contract_code")]
-    ViewGlobalContractCode { code_hash: CryptoHash },
-    ///ViewGlobalContractCodeByAccountId
-    #[serde(rename = "view_global_contract_code_by_account_id")]
-    ViewGlobalContractCodeByAccountId { account_id: AccountId },
-}
 ///`ReceiptEnumView`
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
@@ -3214,6 +3222,8 @@ pub enum ReceiptEnumView {
         already_delivered_shards: ::std::vec::Vec<ShardId>,
         code: ::std::string::String,
         id: GlobalContractIdentifier,
+        #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
+        nonce: ::std::option::Option<u64>,
         target_shard: ShardId,
     },
 }
@@ -3294,6 +3304,39 @@ pub struct RpcBlockResponse {
     pub author: AccountId,
     pub chunks: ::std::vec::Vec<ChunkHeaderView>,
     pub header: BlockHeaderView,
+}
+///`RpcCallFunctionRequest`
+///
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(untagged)]
+pub enum RpcCallFunctionRequest {
+    BlockIdAccountId {
+        account_id: AccountId,
+        args_base64: FunctionArgs,
+        block_id: BlockId,
+        method_name: ::std::string::String,
+    },
+    FinalityAccountId {
+        account_id: AccountId,
+        args_base64: FunctionArgs,
+        finality: Finality,
+        method_name: ::std::string::String,
+    },
+    SyncCheckpointAccountId {
+        account_id: AccountId,
+        args_base64: FunctionArgs,
+        method_name: ::std::string::String,
+        sync_checkpoint: SyncCheckpoint,
+    },
+}
+///A result returned by contract method
+///
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+pub struct RpcCallFunctionResponse {
+    pub block_hash: CryptoHash,
+    pub block_height: u64,
+    pub logs: ::std::vec::Vec<::std::string::String>,
+    pub result: ::std::vec::Vec<u8>,
 }
 ///`RpcChunkRequest`
 ///
@@ -3845,241 +3888,6 @@ shard assignments might become, for example, `[S_2, S_0, S_3, S_1]`.*/
     ///Number of blocks for which a given transaction is valid
     pub transaction_validity_period: u64,
 }
-///`RpcQueryRequest`
-///
-#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
-#[serde(untagged)]
-pub enum RpcQueryRequest {
-    ViewAccountBlockId {
-        account_id: AccountId,
-        block_id: BlockId,
-        request_type: ::std::string::String,
-    },
-    ViewCodeBlockId {
-        account_id: AccountId,
-        block_id: BlockId,
-        request_type: ::std::string::String,
-    },
-    ViewStateBlockId {
-        account_id: AccountId,
-        block_id: BlockId,
-        #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
-        include_proof: ::std::option::Option<bool>,
-        prefix_base64: StoreKey,
-        request_type: ::std::string::String,
-    },
-    ViewAccessKeyBlockId {
-        account_id: AccountId,
-        block_id: BlockId,
-        public_key: PublicKey,
-        request_type: ::std::string::String,
-    },
-    ViewAccessKeyListBlockId {
-        account_id: AccountId,
-        block_id: BlockId,
-        request_type: ::std::string::String,
-    },
-    ViewGasKeyNoncesBlockId {
-        account_id: AccountId,
-        block_id: BlockId,
-        public_key: PublicKey,
-        request_type: ::std::string::String,
-    },
-    CallFunctionBlockId {
-        account_id: AccountId,
-        args_base64: FunctionArgs,
-        block_id: BlockId,
-        method_name: ::std::string::String,
-        request_type: ::std::string::String,
-    },
-    ViewGlobalContractCodeBlockId {
-        block_id: BlockId,
-        code_hash: CryptoHash,
-        request_type: ::std::string::String,
-    },
-    ViewGlobalContractCodeByAccountIdBlockId {
-        account_id: AccountId,
-        block_id: BlockId,
-        request_type: ::std::string::String,
-    },
-    ViewAccountFinality {
-        account_id: AccountId,
-        finality: Finality,
-        request_type: ::std::string::String,
-    },
-    ViewCodeFinality {
-        account_id: AccountId,
-        finality: Finality,
-        request_type: ::std::string::String,
-    },
-    ViewStateFinality {
-        account_id: AccountId,
-        finality: Finality,
-        #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
-        include_proof: ::std::option::Option<bool>,
-        prefix_base64: StoreKey,
-        request_type: ::std::string::String,
-    },
-    ViewAccessKeyFinality {
-        account_id: AccountId,
-        finality: Finality,
-        public_key: PublicKey,
-        request_type: ::std::string::String,
-    },
-    ViewAccessKeyListFinality {
-        account_id: AccountId,
-        finality: Finality,
-        request_type: ::std::string::String,
-    },
-    ViewGasKeyNoncesFinality {
-        account_id: AccountId,
-        finality: Finality,
-        public_key: PublicKey,
-        request_type: ::std::string::String,
-    },
-    CallFunctionFinality {
-        account_id: AccountId,
-        args_base64: FunctionArgs,
-        finality: Finality,
-        method_name: ::std::string::String,
-        request_type: ::std::string::String,
-    },
-    ViewGlobalContractCodeFinality {
-        code_hash: CryptoHash,
-        finality: Finality,
-        request_type: ::std::string::String,
-    },
-    ViewGlobalContractCodeByAccountIdFinality {
-        account_id: AccountId,
-        finality: Finality,
-        request_type: ::std::string::String,
-    },
-    ViewAccountSyncCheckpoint {
-        account_id: AccountId,
-        request_type: ::std::string::String,
-        sync_checkpoint: SyncCheckpoint,
-    },
-    ViewCodeSyncCheckpoint {
-        account_id: AccountId,
-        request_type: ::std::string::String,
-        sync_checkpoint: SyncCheckpoint,
-    },
-    ViewStateSyncCheckpoint {
-        account_id: AccountId,
-        #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
-        include_proof: ::std::option::Option<bool>,
-        prefix_base64: StoreKey,
-        request_type: ::std::string::String,
-        sync_checkpoint: SyncCheckpoint,
-    },
-    ViewAccessKeySyncCheckpoint {
-        account_id: AccountId,
-        public_key: PublicKey,
-        request_type: ::std::string::String,
-        sync_checkpoint: SyncCheckpoint,
-    },
-    ViewAccessKeyListSyncCheckpoint {
-        account_id: AccountId,
-        request_type: ::std::string::String,
-        sync_checkpoint: SyncCheckpoint,
-    },
-    ViewGasKeyNoncesSyncCheckpoint {
-        account_id: AccountId,
-        public_key: PublicKey,
-        request_type: ::std::string::String,
-        sync_checkpoint: SyncCheckpoint,
-    },
-    CallFunctionSyncCheckpoint {
-        account_id: AccountId,
-        args_base64: FunctionArgs,
-        method_name: ::std::string::String,
-        request_type: ::std::string::String,
-        sync_checkpoint: SyncCheckpoint,
-    },
-    ViewGlobalContractCodeSyncCheckpoint {
-        code_hash: CryptoHash,
-        request_type: ::std::string::String,
-        sync_checkpoint: SyncCheckpoint,
-    },
-    ViewGlobalContractCodeByAccountIdSyncCheckpoint {
-        account_id: AccountId,
-        request_type: ::std::string::String,
-        sync_checkpoint: SyncCheckpoint,
-    },
-}
-///`RpcQueryResponse`
-///
-#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
-#[serde(untagged)]
-pub enum RpcQueryResponse {
-    AccountView {
-        amount: NearToken,
-        block_hash: CryptoHash,
-        block_height: u64,
-        code_hash: CryptoHash,
-        #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
-        global_contract_account_id: ::std::option::Option<AccountId>,
-        #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
-        global_contract_hash: ::std::option::Option<CryptoHash>,
-        locked: NearToken,
-        ///TODO(2271): deprecated.
-        #[serde(default)]
-        storage_paid_at: u64,
-        storage_usage: u64,
-    },
-    ContractCodeView {
-        block_hash: CryptoHash,
-        block_height: u64,
-        code_base64: ::std::string::String,
-        hash: CryptoHash,
-    },
-    ViewStateResult {
-        block_hash: CryptoHash,
-        block_height: u64,
-        #[serde(default, skip_serializing_if = "::std::vec::Vec::is_empty")]
-        proof: ::std::vec::Vec<::std::string::String>,
-        values: ::std::vec::Vec<StateItem>,
-    },
-    CallResult {
-        block_hash: CryptoHash,
-        block_height: u64,
-        logs: ::std::vec::Vec<::std::string::String>,
-        result: ::std::vec::Vec<u8>,
-    },
-    AccessKeyView {
-        block_hash: CryptoHash,
-        block_height: u64,
-        nonce: u64,
-        permission: AccessKeyPermissionView,
-    },
-    AccessKeyList {
-        block_hash: CryptoHash,
-        block_height: u64,
-        keys: ::std::vec::Vec<AccessKeyInfoView>,
-    },
-    BlockHeightBlockHash(RpcQueryResponseBlockHeightBlockHash),
-}
-impl ::std::convert::From<RpcQueryResponseBlockHeightBlockHash> for RpcQueryResponse {
-    fn from(value: RpcQueryResponseBlockHeightBlockHash) -> Self {
-        Self::BlockHeightBlockHash(value)
-    }
-}
-///`RpcQueryResponseBlockHeightBlockHash`
-///
-#[derive(
-    ::serde::Deserialize,
-    ::serde::Serialize,
-    Clone,
-    Copy,
-    Debug,
-    Eq,
-    Hash,
-    Ord,
-    PartialEq,
-    PartialOrd
-)]
-#[serde(deny_unknown_fields)]
-pub enum RpcQueryResponseBlockHeightBlockHash {}
 ///`RpcReceiptRequest`
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
@@ -4156,84 +3964,126 @@ impl ::std::default::Default for RpcSplitStorageInfoResponse {
         }
     }
 }
-///`RpcStateChangesInBlockByTypeRequest`
+/**It is a [serializable view] of [`StateChangesRequest`].
+
+[serializable view]: ./index.html
+[`StateChangesRequest`]: ../types/struct.StateChangesRequest.html*/
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
 #[serde(untagged)]
 pub enum RpcStateChangesInBlockByTypeRequest {
-    AccountChangesBlockId {
+    Variant0(RpcStateChangesInBlockByTypeRequestVariant0),
+    Variant1(RpcStateChangesInBlockByTypeRequestVariant1),
+    Variant2(RpcStateChangesInBlockByTypeRequestVariant2),
+}
+impl ::std::convert::From<RpcStateChangesInBlockByTypeRequestVariant0>
+for RpcStateChangesInBlockByTypeRequest {
+    fn from(value: RpcStateChangesInBlockByTypeRequestVariant0) -> Self {
+        Self::Variant0(value)
+    }
+}
+impl ::std::convert::From<RpcStateChangesInBlockByTypeRequestVariant1>
+for RpcStateChangesInBlockByTypeRequest {
+    fn from(value: RpcStateChangesInBlockByTypeRequestVariant1) -> Self {
+        Self::Variant1(value)
+    }
+}
+impl ::std::convert::From<RpcStateChangesInBlockByTypeRequestVariant2>
+for RpcStateChangesInBlockByTypeRequest {
+    fn from(value: RpcStateChangesInBlockByTypeRequestVariant2) -> Self {
+        Self::Variant2(value)
+    }
+}
+///`RpcStateChangesInBlockByTypeRequestVariant0`
+///
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(untagged)]
+pub enum RpcStateChangesInBlockByTypeRequestVariant0 {
+    Variant0 {
         account_ids: ::std::vec::Vec<AccountId>,
         block_id: BlockId,
         changes_type: ::std::string::String,
     },
-    SingleAccessKeyChangesBlockId {
+    Variant1 {
         block_id: BlockId,
         changes_type: ::std::string::String,
         keys: ::std::vec::Vec<AccountWithPublicKey>,
     },
-    AllAccessKeyChangesBlockId {
+    Variant2 {
         account_ids: ::std::vec::Vec<AccountId>,
         block_id: BlockId,
         changes_type: ::std::string::String,
     },
-    ContractCodeChangesBlockId {
+    Variant3 {
         account_ids: ::std::vec::Vec<AccountId>,
         block_id: BlockId,
         changes_type: ::std::string::String,
     },
-    DataChangesBlockId {
+    Variant4 {
         account_ids: ::std::vec::Vec<AccountId>,
         block_id: BlockId,
         changes_type: ::std::string::String,
         key_prefix_base64: StoreKey,
     },
-    AccountChangesFinality {
+}
+///`RpcStateChangesInBlockByTypeRequestVariant1`
+///
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(untagged)]
+pub enum RpcStateChangesInBlockByTypeRequestVariant1 {
+    Variant0 {
         account_ids: ::std::vec::Vec<AccountId>,
         changes_type: ::std::string::String,
         finality: Finality,
     },
-    SingleAccessKeyChangesFinality {
+    Variant1 {
         changes_type: ::std::string::String,
         finality: Finality,
         keys: ::std::vec::Vec<AccountWithPublicKey>,
     },
-    AllAccessKeyChangesFinality {
+    Variant2 {
         account_ids: ::std::vec::Vec<AccountId>,
         changes_type: ::std::string::String,
         finality: Finality,
     },
-    ContractCodeChangesFinality {
+    Variant3 {
         account_ids: ::std::vec::Vec<AccountId>,
         changes_type: ::std::string::String,
         finality: Finality,
     },
-    DataChangesFinality {
+    Variant4 {
         account_ids: ::std::vec::Vec<AccountId>,
         changes_type: ::std::string::String,
         finality: Finality,
         key_prefix_base64: StoreKey,
     },
-    AccountChangesSyncCheckpoint {
+}
+///`RpcStateChangesInBlockByTypeRequestVariant2`
+///
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(untagged)]
+pub enum RpcStateChangesInBlockByTypeRequestVariant2 {
+    Variant0 {
         account_ids: ::std::vec::Vec<AccountId>,
         changes_type: ::std::string::String,
         sync_checkpoint: SyncCheckpoint,
     },
-    SingleAccessKeyChangesSyncCheckpoint {
+    Variant1 {
         changes_type: ::std::string::String,
         keys: ::std::vec::Vec<AccountWithPublicKey>,
         sync_checkpoint: SyncCheckpoint,
     },
-    AllAccessKeyChangesSyncCheckpoint {
+    Variant2 {
         account_ids: ::std::vec::Vec<AccountId>,
         changes_type: ::std::string::String,
         sync_checkpoint: SyncCheckpoint,
     },
-    ContractCodeChangesSyncCheckpoint {
+    Variant3 {
         account_ids: ::std::vec::Vec<AccountId>,
         changes_type: ::std::string::String,
         sync_checkpoint: SyncCheckpoint,
     },
-    DataChangesSyncCheckpoint {
+    Variant4 {
         account_ids: ::std::vec::Vec<AccountId>,
         changes_type: ::std::string::String,
         key_prefix_base64: StoreKey,
@@ -4460,6 +4310,131 @@ impl ::std::default::Default for RpcValidatorsOrderedRequest {
             block_id: Default::default(),
         }
     }
+}
+///`RpcViewAccessKeyListRequest`
+///
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(untagged)]
+pub enum RpcViewAccessKeyListRequest {
+    BlockIdAccountId { account_id: AccountId, block_id: BlockId },
+    FinalityAccountId { account_id: AccountId, finality: Finality },
+    SyncCheckpointAccountId { account_id: AccountId, sync_checkpoint: SyncCheckpoint },
+}
+///Lists access keys
+///
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+pub struct RpcViewAccessKeyListResponse {
+    pub block_hash: CryptoHash,
+    pub block_height: u64,
+    pub keys: ::std::vec::Vec<AccessKeyInfoView>,
+}
+///`RpcViewAccessKeyRequest`
+///
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(untagged)]
+pub enum RpcViewAccessKeyRequest {
+    BlockIdAccountId { account_id: AccountId, block_id: BlockId, public_key: PublicKey },
+    FinalityAccountId {
+        account_id: AccountId,
+        finality: Finality,
+        public_key: PublicKey,
+    },
+    SyncCheckpointAccountId {
+        account_id: AccountId,
+        public_key: PublicKey,
+        sync_checkpoint: SyncCheckpoint,
+    },
+}
+///Describes access key permission scope and nonce.
+///
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+pub struct RpcViewAccessKeyResponse {
+    pub block_hash: CryptoHash,
+    pub block_height: u64,
+    pub nonce: u64,
+    pub permission: AccessKeyPermissionView,
+}
+///`RpcViewAccountRequest`
+///
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(untagged)]
+pub enum RpcViewAccountRequest {
+    BlockIdAccountId { account_id: AccountId, block_id: BlockId },
+    FinalityAccountId { account_id: AccountId, finality: Finality },
+    SyncCheckpointAccountId { account_id: AccountId, sync_checkpoint: SyncCheckpoint },
+}
+///A view of the account
+///
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+pub struct RpcViewAccountResponse {
+    pub amount: NearToken,
+    pub block_hash: CryptoHash,
+    pub block_height: u64,
+    pub code_hash: CryptoHash,
+    #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
+    pub global_contract_account_id: ::std::option::Option<AccountId>,
+    #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
+    pub global_contract_hash: ::std::option::Option<CryptoHash>,
+    pub locked: NearToken,
+    ///TODO(2271): deprecated.
+    #[serde(default)]
+    pub storage_paid_at: u64,
+    pub storage_usage: u64,
+}
+///`RpcViewCodeRequest`
+///
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(untagged)]
+pub enum RpcViewCodeRequest {
+    BlockIdAccountId { account_id: AccountId, block_id: BlockId },
+    FinalityAccountId { account_id: AccountId, finality: Finality },
+    SyncCheckpointAccountId { account_id: AccountId, sync_checkpoint: SyncCheckpoint },
+}
+///A view of the contract code.
+///
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+pub struct RpcViewCodeResponse {
+    pub block_hash: CryptoHash,
+    pub block_height: u64,
+    pub code_base64: ::std::string::String,
+    pub hash: CryptoHash,
+}
+///`RpcViewStateRequest`
+///
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+#[serde(untagged)]
+pub enum RpcViewStateRequest {
+    BlockIdAccountId {
+        account_id: AccountId,
+        block_id: BlockId,
+        #[serde(default)]
+        include_proof: bool,
+        prefix_base64: StoreKey,
+    },
+    FinalityAccountId {
+        account_id: AccountId,
+        finality: Finality,
+        #[serde(default)]
+        include_proof: bool,
+        prefix_base64: StoreKey,
+    },
+    SyncCheckpointAccountId {
+        account_id: AccountId,
+        #[serde(default)]
+        include_proof: bool,
+        prefix_base64: StoreKey,
+        sync_checkpoint: SyncCheckpoint,
+    },
+}
+///Resulting state values for a view state query request
+///
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+pub struct RpcViewStateResponse {
+    pub block_hash: CryptoHash,
+    pub block_height: u64,
+    #[serde(default, skip_serializing_if = "::std::vec::Vec::is_empty")]
+    pub proof: ::std::vec::Vec<::std::string::String>,
+    pub values: ::std::vec::Vec<StateItem>,
 }
 ///View that preserves JSON format of the runtime config.
 ///
@@ -5346,6 +5321,21 @@ pub struct TransferToGasKeyAction {
     ///The public key of the gas key to fund
     pub public_key: PublicKey,
 }
+/**The result of splitting a memtrie into two possibly even parts, according to `memory_usage`
+stored in the trie nodes.
+
+**NOTE: This is an artificial value calculated according to `TRIE_COST`. Hence, it does not
+represent actual memory allocation, but the split ratio should be roughly consistent with that.***/
+///
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+pub struct TrieSplit {
+    ///Account ID representing the split path
+    pub boundary_account: AccountId,
+    ///Total `memory_usage` of the left part (excluding the split path)
+    pub left_memory: u64,
+    ///Total `memory_usage` of the right part (including the split path)
+    pub right_memory: u64,
+}
 ///Error returned in the ExecutionOutcome in case of failure
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
@@ -5546,14 +5536,6 @@ pub struct Version {
     pub rustc_version: ::std::string::String,
     pub version: ::std::string::String,
 }
-///Resulting state values for a view state query request
-///
-#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
-pub struct ViewStateResult {
-    #[serde(default, skip_serializing_if = "::std::vec::Vec::is_empty")]
-    pub proof: ::std::vec::Vec<::std::string::String>,
-    pub values: ::std::vec::Vec<StateItem>,
-}
 ///`VmConfigView`
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
@@ -5564,6 +5546,8 @@ pub struct VmConfigView {
     pub discard_custom_sections: bool,
     ///See [VMConfig::eth_implicit_accounts](crate::vm::Config::eth_implicit_accounts).
     pub eth_implicit_accounts: bool,
+    ///See [VMConfig::eth_implicit_global_contract](crate::vm::Config::eth_implicit_global_contract).
+    pub eth_implicit_global_contract: bool,
     ///Costs for runtime externals
     pub ext_costs: ExtCostsConfigView,
     ///See [VMConfig::fix_contract_loading_cost](crate::vm::Config::fix_contract_loading_cost).
@@ -5759,7 +5743,10 @@ impl ::std::convert::TryFrom<::std::string::String> for WasmTrap {
         value.parse()
     }
 }
-///Withdraw NEAR from a gas key's balance to the account
+/**Withdraw NEAR from a gas key's balance to the account.
+
+This action must only be available via transactions, not via contract execution
+(there is no corresponding promise batch action host function).*/
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
 pub struct WithdrawFromGasKeyAction {
