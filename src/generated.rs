@@ -5847,3 +5847,31 @@ pub mod defaults {
         super::TxExecutionStatus::ExecutedOptimistic
     }
 }
+/// Unified request enum for NEAR's polymorphic `query` JSON-RPC method.
+///
+/// Serializes with a `request_type` discriminant field in snake_case,
+/// matching what the NEAR RPC node expects.
+#[derive(::serde::Serialize, Clone, Debug)]
+#[serde(tag = "request_type", rename_all = "snake_case")]
+pub enum RpcQueryRequest {
+    ViewAccount(RpcViewAccountRequest),
+    ViewCode(RpcViewCodeRequest),
+    ViewState(RpcViewStateRequest),
+    ViewAccessKey(RpcViewAccessKeyRequest),
+    ViewAccessKeyList(RpcViewAccessKeyListRequest),
+    CallFunction(RpcCallFunctionRequest),
+}
+/// Unified response enum for NEAR's polymorphic `query` JSON-RPC method.
+///
+/// Deserializes as untagged since the NEAR RPC node does not include a
+/// discriminant in query responses.
+#[derive(::serde::Deserialize, Clone, Debug)]
+#[serde(untagged)]
+pub enum RpcQueryResponse {
+    ViewAccount(RpcViewAccountResponse),
+    ViewCode(RpcViewCodeResponse),
+    ViewState(RpcViewStateResponse),
+    ViewAccessKey(RpcViewAccessKeyResponse),
+    ViewAccessKeyList(RpcViewAccessKeyListResponse),
+    CallFunction(RpcCallFunctionResponse),
+}
