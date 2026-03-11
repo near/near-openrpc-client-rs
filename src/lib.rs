@@ -30,6 +30,7 @@
 //! }
 //! ```
 
+pub mod errors;
 pub mod types;
 
 #[cfg(feature = "client")]
@@ -38,4 +39,5 @@ pub mod client;
 #[cfg(feature = "client")]
 pub use client::NearRpcClient;
 
+pub use errors::*;
 pub use types::*;
