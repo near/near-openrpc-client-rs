@@ -11,6 +11,30 @@ use serde::{Deserialize, Serialize};
 
 use crate::types::{AccountId, CryptoHash, PublicKey, ShardId};
 
+/// Legacy error response from nearcore's backward-compatible query handling.
+///
+/// Nearcore returns `UnknownAccessKey` and `ContractExecutionError` as fake success
+/// responses (inside the `"result"` field) instead of proper JSON-RPC errors, for
+/// backward compatibility. This type captures that legacy shape so callers get a
+/// meaningful error instead of a confusing deserialization failure.
+///
+/// See: <https://github.com/near/nearcore/blob/master/chain/jsonrpc/src/lib.rs>
+#[derive(Debug, Clone, Serialize, Deserialize, thiserror::Error)]
+#[error("{error}")]
+pub struct LegacyQueryError {
+    /// The error message, e.g. "access key ed25519:... does not exist while viewing"
+    pub error: String,
+    /// Logs from contract execution (empty for access key errors)
+    #[serde(default)]
+    pub logs: Vec<String>,
+    /// Block height at which the query was executed
+    #[serde(default)]
+    pub block_height: Option<u64>,
+    /// Block hash at which the query was executed
+    #[serde(default)]
+    pub block_hash: Option<String>,
+}
+
 /// JSON-RPC error returned by the NEAR node.
 ///
 /// NEAR's RPC extends the standard JSON-RPC error with `name` and `cause` fields
@@ -437,6 +461,21 @@ mod tests {
             }
             other => panic!("expected ContractExecutionError, got: {other:?}"),
         }
+    }
+
+    #[test]
+    fn deserialize_legacy_query_error() {
+        let json = serde_json::json!({
+            "error": "access key ed25519:abc does not exist while viewing",
+            "logs": [],
+            "block_height": 100,
+            "block_hash": "9FMnGHBEfJ3PoKzSaq7EwCotanD3RLGA9UFqEjB3hrN1"
+        });
+
+        let err: super::LegacyQueryError = serde_json::from_value(json).unwrap();
+        assert!(err.error.contains("does not exist"));
+        assert_eq!(err.block_height, Some(100));
+        assert!(err.logs.is_empty());
     }
 
     #[test]

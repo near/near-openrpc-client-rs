@@ -1,6 +1,6 @@
 //! Async JSON-RPC client for NEAR Protocol.
 
-use crate::errors::RpcError;
+use crate::errors::{LegacyQueryError, RpcError};
 use crate::types::*;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
@@ -42,6 +42,13 @@ pub enum Error {
     Rpc(#[from] RpcError),
     #[error("JSON error: {0}")]
     Json(#[from] serde_json::Error),
+    /// Legacy error from nearcore's backward-compatible query handling.
+    ///
+    /// Returned when nearcore sends errors like `UnknownAccessKey` or
+    /// `ContractExecutionError` as fake success responses inside the `"result"`
+    /// field instead of as proper JSON-RPC errors.
+    #[error("Legacy RPC query error: {0}")]
+    LegacyQueryResult(LegacyQueryError),
 }
 
 /// Result type alias for client operations.
@@ -114,7 +121,7 @@ impl NearRpcClient {
             params,
         };
 
-        let response: RpcResponse<R> = self
+        let raw: serde_json::Value = self
             .client
             .post(&self.url)
             .json(&request)
@@ -123,9 +130,28 @@ impl NearRpcClient {
             .json()
             .await?;
 
-        match response.result {
-            RpcResult::Ok { result } => Ok(result),
-            RpcResult::Err { error } => Err(Error::Rpc(error)),
+        match serde_json::from_value::<RpcResponse<R>>(raw.clone()) {
+            Ok(response) => match response.result {
+                RpcResult::Ok { result } => Ok(result),
+                RpcResult::Err { error } => Err(Error::Rpc(error)),
+            },
+            Err(deser_err) => {
+                // Nearcore returns UnknownAccessKey and ContractExecutionError as
+                // fake success responses for backward compatibility:
+                //   {"result": {"error": "...", "logs": [], "block_height": ..., "block_hash": "..."}}
+                // These fail normal deserialization because they sit in the "result"
+                // field but don't match any valid response type.
+                if let Some(legacy) = raw
+                    .get("result")
+                    .and_then(|r| r.get("error"))
+                    .and_then(|_| raw.get("result"))
+                    .and_then(|r| serde_json::from_value::<LegacyQueryError>(r.clone()).ok())
+                {
+                    Err(Error::LegacyQueryResult(legacy))
+                } else {
+                    Err(Error::Json(deser_err))
+                }
+            }
         }
     }
 
@@ -357,6 +383,74 @@ impl NearRpcClient {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_legacy_query_error_deserialization() {
+        // Simulates the legacy nearcore response for UnknownAccessKey
+        let legacy_result = serde_json::json!({
+            "error": "access key ed25519:5BGSaf6YjVm7565VzWQHNxoyEjwr3jUpRJSGjREvU9dB does not exist while viewing",
+            "logs": [],
+            "block_height": 12345,
+            "block_hash": "9FMnGHBEfJ3PoKzSaq7EwCotanD3RLGA9UFqEjB3hrN1"
+        });
+
+        let legacy: LegacyQueryError =
+            serde_json::from_value(legacy_result).expect("should parse legacy error");
+        assert!(legacy.error.contains("does not exist while viewing"));
+        assert_eq!(legacy.block_height, Some(12345));
+        assert_eq!(
+            legacy.block_hash.as_deref(),
+            Some("9FMnGHBEfJ3PoKzSaq7EwCotanD3RLGA9UFqEjB3hrN1")
+        );
+        assert!(legacy.logs.is_empty());
+    }
+
+    #[test]
+    fn test_legacy_contract_execution_error_deserialization() {
+        // Simulates the legacy nearcore response for ContractExecutionError
+        let legacy_result = serde_json::json!({
+            "error": "wasm execution failed with error: FunctionCallError(HostError(GasExceeded))",
+            "logs": ["log1", "log2"],
+            "block_height": 99999,
+            "block_hash": "4reLvkAWfqk5fsqio1KLudk46cqRz9erQdaHkWZKMJDZ"
+        });
+
+        let legacy: LegacyQueryError =
+            serde_json::from_value(legacy_result).expect("should parse legacy error");
+        assert!(legacy.error.contains("wasm execution failed"));
+        assert_eq!(legacy.logs, vec!["log1", "log2"]);
+        assert_eq!(legacy.block_height, Some(99999));
+    }
+
+    #[test]
+    fn test_rpc_result_falls_through_to_legacy_check() {
+        // A full JSON-RPC response with the legacy error shape in "result"
+        let raw = serde_json::json!({
+            "jsonrpc": "2.0",
+            "id": 1,
+            "result": {
+                "error": "access key ed25519:5BGSaf6YjVm7565VzWQHNxoyEjwr3jUpRJSGjREvU9dB does not exist while viewing",
+                "logs": [],
+                "block_height": 12345,
+                "block_hash": "9FMnGHBEfJ3PoKzSaq7EwCotanD3RLGA9UFqEjB3hrN1"
+            }
+        });
+
+        // Normal deserialization as RpcResponse<RpcViewAccessKeyResponse> should fail
+        let normal_result =
+            serde_json::from_value::<RpcResponse<RpcViewAccessKeyResponse>>(raw.clone());
+        assert!(normal_result.is_err());
+
+        // But the legacy fallback should parse successfully
+        let legacy = raw
+            .get("result")
+            .and_then(|r| serde_json::from_value::<LegacyQueryError>(r.clone()).ok());
+        assert!(legacy.is_some());
+        assert!(legacy
+            .unwrap()
+            .error
+            .contains("does not exist while viewing"));
+    }
 
     #[test]
     fn test_client_creation() {
