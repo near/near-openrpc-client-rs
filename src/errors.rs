@@ -32,7 +32,7 @@ pub struct LegacyQueryError {
     pub block_height: Option<u64>,
     /// Block hash at which the query was executed
     #[serde(default)]
-    pub block_hash: Option<String>,
+    pub block_hash: Option<CryptoHash>,
 }
 
 /// JSON-RPC error returned by the NEAR node.

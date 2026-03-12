@@ -398,8 +398,8 @@ mod tests {
         assert!(legacy.error.contains("does not exist while viewing"));
         assert_eq!(legacy.block_height, Some(12345));
         assert_eq!(
-            legacy.block_hash.as_deref(),
-            Some("9FMnGHBEfJ3PoKzSaq7EwCotanD3RLGA9UFqEjB3hrN1")
+            legacy.block_hash.map(|h| h.0),
+            Some("9FMnGHBEfJ3PoKzSaq7EwCotanD3RLGA9UFqEjB3hrN1".to_string())
         );
         assert!(legacy.logs.is_empty());
     }
