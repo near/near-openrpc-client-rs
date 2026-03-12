@@ -446,10 +446,12 @@ mod tests {
             .get("result")
             .and_then(|r| serde_json::from_value::<LegacyQueryError>(r.clone()).ok());
         assert!(legacy.is_some());
-        assert!(legacy
-            .unwrap()
-            .error
-            .contains("does not exist while viewing"));
+        assert!(
+            legacy
+                .unwrap()
+                .error
+                .contains("does not exist while viewing")
+        );
     }
 
     #[test]
