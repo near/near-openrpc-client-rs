@@ -141,12 +141,11 @@ impl NearRpcClient {
                 //   {"result": {"error": "...", "logs": [], "block_height": ..., "block_hash": "..."}}
                 // These fail normal deserialization because they sit in the "result"
                 // field but don't match any valid response type.
-                if let Some(legacy) = raw
-                    .get("result")
-                    .and_then(|r| r.get("error"))
-                    .and_then(|_| raw.get("result"))
-                    .and_then(|r| serde_json::from_value::<LegacyQueryError>(r.clone()).ok())
-                {
+                if let Some(legacy) = raw.get("result").and_then(|result| {
+                    result.get("error").and_then(|_| {
+                        serde_json::from_value::<LegacyQueryError>(result.clone()).ok()
+                    })
+                }) {
                     Err(Error::LegacyQueryResult(legacy))
                 } else {
                     Err(Error::Json(deser_err))
