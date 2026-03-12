@@ -19,9 +19,15 @@ jobs:
 
       - name: Fetch latest openrpc.json from nearcore
         run: |
+          LATEST_TAG=$(curl -sSfL \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/near/nearcore/releases/latest" \
+            | jq -r '.tag_name')
+          echo "Using nearcore release: $LATEST_TAG"
           curl -sSfL \
-            "https://raw.githubusercontent.com/near/nearcore/master/chain/jsonrpc/openapi/openrpc.json" \
+            "https://raw.githubusercontent.com/near/nearcore/${LATEST_TAG}/chain/jsonrpc/openapi/openrpc.json" \
             -o openrpc.json
+          echo "NEARCORE_TAG=$LATEST_TAG" >> "$GITHUB_ENV"
 
       - name: Check for changes
         id: diff
@@ -50,7 +56,7 @@ jobs:
           title: "chore: sync openrpc.json and regenerate types"
           body: |
             Auto-generated PR to update `openrpc.json` from
-            [nearcore master](https://github.com/near/nearcore/blob/master/chain/jsonrpc/openapi/openrpc.json)
+            [nearcore ${{ env.NEARCORE_TAG }}](https://github.com/near/nearcore/blob/${{ env.NEARCORE_TAG }}/chain/jsonrpc/openapi/openrpc.json)
             and regenerate `src/generated.rs`.
 
             Please review the diff and verify correctness.
