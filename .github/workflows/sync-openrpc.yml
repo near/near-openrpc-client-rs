@@ -23,11 +23,17 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             "https://api.github.com/repos/near/nearcore/releases/latest" \
             | jq -r '.tag_name')
-          echo "Using nearcore release: $LATEST_TAG"
-          curl -sSfL \
-            "https://raw.githubusercontent.com/near/nearcore/${LATEST_TAG}/chain/jsonrpc/openapi/openrpc.json" \
-            -o openrpc.json
-          echo "NEARCORE_TAG=$LATEST_TAG" >> "$GITHUB_ENV"
+          URL="https://raw.githubusercontent.com/near/nearcore/${LATEST_TAG}/chain/jsonrpc/openapi/openrpc.json"
+          if curl -sSf -o openrpc.json "$URL"; then
+            echo "Using nearcore release: $LATEST_TAG"
+            echo "NEARCORE_TAG=$LATEST_TAG" >> "$GITHUB_ENV"
+          else
+            echo "openrpc.json not found in release $LATEST_TAG, falling back to master"
+            curl -sSfL \
+              "https://raw.githubusercontent.com/near/nearcore/master/chain/jsonrpc/openapi/openrpc.json" \
+              -o openrpc.json
+            echo "NEARCORE_TAG=master" >> "$GITHUB_ENV"
+          fi
 
       - name: Check for changes
         id: diff
