@@ -1367,10 +1367,9 @@ impl ::std::fmt::Display for EpochId {
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
 pub struct EpochSyncConfig {
     /**Number of epochs behind the network head beyond which the node will use
-epoch sync instead of header sync. Also the maximum age (in epochs) of
-accepted epoch sync proofs. At the consumption site, this is multiplied
-by epoch_length to get the horizon in blocks.*/
-    #[serde(default = "defaults::default_u64::<u64, 4>")]
+epoch sync instead of header sync. At the consumption site, this is
+multiplied by epoch_length to get the horizon in blocks.*/
+    #[serde(default = "defaults::default_u64::<u64, 2>")]
     pub epoch_sync_horizon_num_epochs: u64,
     /**Timeout for epoch sync requests. The node will continue retrying indefinitely even
 if this timeout is exceeded.*/
@@ -5552,6 +5551,8 @@ pub struct VmConfigView {
     pub ext_costs: ExtCostsConfigView,
     ///See [VMConfig::fix_contract_loading_cost](crate::vm::Config::fix_contract_loading_cost).
     pub fix_contract_loading_cost: bool,
+    ///See [VMConfig::gas_key_host_fns](crate::vm::Config::gas_key_host_fns).
+    pub gas_key_host_fns: bool,
     ///See [VMConfig::global_contract_host_fns](crate::vm::Config::global_contract_host_fns).
     pub global_contract_host_fns: bool,
     ///Gas cost of a growing memory by single page.
