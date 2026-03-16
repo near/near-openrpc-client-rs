@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0](https://github.com/near/near-openrpc-client-rs/compare/v0.1.0...v0.2.0) - 2026-03-12
+
+### Fixed
+
+- handle legacy nearcore error responses for query methods ([#17](https://github.com/near/near-openrpc-client-rs/pull/17))
+- fall back to master when openrpc.json missing from latest release ([#16](https://github.com/near/near-openrpc-client-rs/pull/16))
+
+### Other
+
+- sync openrpc.json and regenerate types ([#13](https://github.com/near/near-openrpc-client-rs/pull/13))
+- sync openrpc.json from latest nearcore release instead of master ([#14](https://github.com/near/near-openrpc-client-rs/pull/14))
+
 ## [0.1.0](https://github.com/near/near-openrpc-client-rs/releases/tag/v0.1.0) - 2026-03-11
 
 ### Added
