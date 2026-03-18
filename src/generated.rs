@@ -2915,6 +2915,72 @@ impl ::std::convert::From<WithdrawFromGasKeyAction> for NonDelegateAction {
         Self::WithdrawFromGasKey(value)
     }
 }
+///Controls how the transaction nonce is validated against the access key nonce.
+///
+#[derive(
+    ::serde::Deserialize,
+    ::serde::Serialize,
+    Clone,
+    Copy,
+    Debug,
+    Eq,
+    Hash,
+    Ord,
+    PartialEq,
+    PartialOrd
+)]
+pub enum NonceMode {
+    ///Any nonce strictly greater than the current access key nonce (default behavior).
+    #[serde(rename = "monotonic")]
+    Monotonic,
+    ///Nonce must be exactly `ak_nonce + 1` (sequential ordering).
+    #[serde(rename = "strict")]
+    Strict,
+}
+impl ::std::fmt::Display for NonceMode {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+        match *self {
+            Self::Monotonic => f.write_str("monotonic"),
+            Self::Strict => f.write_str("strict"),
+        }
+    }
+}
+impl ::std::str::FromStr for NonceMode {
+    type Err = self::error::ConversionError;
+    fn from_str(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        match value {
+            "monotonic" => Ok(Self::Monotonic),
+            "strict" => Ok(Self::Strict),
+            _ => Err("invalid value".into()),
+        }
+    }
+}
+impl ::std::convert::TryFrom<&str> for NonceMode {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &str,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+impl ::std::convert::TryFrom<&::std::string::String> for NonceMode {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: &::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
+impl ::std::convert::TryFrom<::std::string::String> for NonceMode {
+    type Error = self::error::ConversionError;
+    fn try_from(
+        value: ::std::string::String,
+    ) -> ::std::result::Result<Self, self::error::ConversionError> {
+        value.parse()
+    }
+}
 ///Peer id is the public key.
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
@@ -3545,6 +3611,10 @@ If disabled, the node will do Block Sync instead of State Sync.*/
 will be unbounded.*/
     #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
     pub transaction_pool_size_limit: ::std::option::Option<u64>,
+    /**TTL in blocks for gapped strict-nonce transactions in the pool. Transactions with a
+nonce gap whose block_hash is older than this many blocks are evicted during
+prepare_transactions.*/
+    pub transaction_pool_strict_nonce_ttl_blocks: u64,
     pub transaction_request_handler_threads: u32,
     ///Upper bound of the byte size of contract state that is still viewable. None is no limit
     #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
@@ -4745,6 +4815,8 @@ pub struct SignedTransactionView {
     pub nonce: u64,
     #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
     pub nonce_index: ::std::option::Option<u16>,
+    #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
+    pub nonce_mode: ::std::option::Option<NonceMode>,
     ///Deprecated, retained for backward compatibility.
     #[serde(default)]
     pub priority_fee: u64,
