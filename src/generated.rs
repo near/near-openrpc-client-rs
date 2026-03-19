@@ -3565,6 +3565,8 @@ This option can cause extra load on the database and is not recommended for prod
 Saving the latest witnesses is useful for analysis and debugging.
 This option can cause extra load on the database and is not recommended for production use.*/
     pub save_latest_witnesses: bool,
+    ///Whether to persist receipt-to-tx origin mappings to disk or not.
+    pub save_receipt_to_tx: bool,
     ///Whether to persist state changes on disk or not.
     pub save_state_changes: bool,
     /**save_trie_changes should be set to true iff
