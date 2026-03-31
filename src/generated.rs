@@ -1938,8 +1938,6 @@ impl ::std::default::Default for GcConfig {
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
 pub struct GenesisConfig {
-    ///Expected number of hidden validators per shard.
-    pub avg_hidden_validator_seats_per_shard: ::std::vec::Vec<u64>,
     ///Threshold for kicking out block producers, between 0 and 100.
     pub block_producer_kickout_threshold: u8,
     /**ID of the blockchain. This must be unique for every blockchain.
@@ -1989,15 +1987,8 @@ See <https://github.com/near/NEPs/pull/167> for details*/
     pub minimum_validators_per_shard: u64,
     ///Number of block producer seats at genesis.
     pub num_block_producer_seats: u64,
-    /**Defines number of shards and number of block producer seats per each shard at genesis.
-Note: not used with protocol_feature_chunk_only_producers -- replaced by minimum_validators_per_shard
-Note: not used before as all block producers produce chunks for all shards*/
-    pub num_block_producer_seats_per_shard: ::std::vec::Vec<u64>,
     ///Expected number of blocks per year
     pub num_blocks_per_year: u64,
-    ///Deprecated.
-    #[serde(default = "defaults::default_u64::<u64, 300>")]
-    pub num_chunk_only_producer_seats: u64,
     /**Number of chunk producers.
 Don't mess it up with chunk-only producers feature which is deprecated.*/
     #[serde(default = "defaults::default_u64::<u64, 100>")]
@@ -2404,11 +2395,19 @@ NOTE: It's not a limiter itself, but it's a value we use for initial_memory_page
     ///If present, stores max number of elements in a single contract's table
     #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
     pub max_elements_per_contract_table: ::std::option::Option<u32>,
+    ///If present, stores max byte size of a single function body in a contract
+    #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
+    pub max_function_body_size: ::std::option::Option<u64>,
     ///If present, stores max number of functions in one contract
     #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
     pub max_functions_number_per_contract: ::std::option::Option<u64>,
     ///Max amount of gas that can be used, excluding gas attached to promises.
     pub max_gas_burnt: NearGas,
+    /**If present, stores max byte size of the wasm code after gas instrumentation.
+This prevents Cranelift's 24-bit SSA counter from overflowing on
+pathologically large contracts.*/
+    #[serde(default, skip_serializing_if = "::std::option::Option::is_none")]
+    pub max_instrumented_code_size: ::std::option::Option<u64>,
     ///Max length of any method name (without terminating character).
     pub max_length_method_name: u64,
     ///Max length of returned data
@@ -3093,6 +3092,10 @@ instantiable and/or un-linkable.*/
     TooManyTables,
     ///Contract contains too many table elements.
     TooManyTableElements,
+    ///A function body in the contract exceeds the size limit.
+    FunctionBodyTooLarge,
+    ///The instrumented code exceeds the size limit.
+    InstrumentedCodeTooLarge,
 }
 impl ::std::fmt::Display for PrepareError {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
@@ -3108,6 +3111,8 @@ impl ::std::fmt::Display for PrepareError {
             Self::TooManyLocals => f.write_str("TooManyLocals"),
             Self::TooManyTables => f.write_str("TooManyTables"),
             Self::TooManyTableElements => f.write_str("TooManyTableElements"),
+            Self::FunctionBodyTooLarge => f.write_str("FunctionBodyTooLarge"),
+            Self::InstrumentedCodeTooLarge => f.write_str("InstrumentedCodeTooLarge"),
         }
     }
 }
@@ -3128,6 +3133,8 @@ impl ::std::str::FromStr for PrepareError {
             "TooManyLocals" => Ok(Self::TooManyLocals),
             "TooManyTables" => Ok(Self::TooManyTables),
             "TooManyTableElements" => Ok(Self::TooManyTableElements),
+            "FunctionBodyTooLarge" => Ok(Self::FunctionBodyTooLarge),
+            "InstrumentedCodeTooLarge" => Ok(Self::InstrumentedCodeTooLarge),
             _ => Err("invalid value".into()),
         }
     }
@@ -3565,6 +3572,8 @@ This option can cause extra load on the database and is not recommended for prod
 Saving the latest witnesses is useful for analysis and debugging.
 This option can cause extra load on the database and is not recommended for production use.*/
     pub save_latest_witnesses: bool,
+    ///Whether to persist receipt-to-tx origin mappings to disk or not.
+    pub save_receipt_to_tx: bool,
     ///Whether to persist state changes on disk or not.
     pub save_state_changes: bool,
     /**save_trie_changes should be set to true iff
@@ -3885,8 +3894,6 @@ impl ::std::convert::From<SyncCheckpoint> for RpcProtocolConfigRequest {
 ///
 #[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
 pub struct RpcProtocolConfigResponse {
-    ///Expected number of hidden validators per shard.
-    pub avg_hidden_validator_seats_per_shard: ::std::vec::Vec<u64>,
     ///Threshold for kicking out block producers, between 0 and 100.
     pub block_producer_kickout_threshold: u8,
     /**ID of the blockchain. This must be unique for every blockchain.
@@ -3927,8 +3934,6 @@ See <https://github.com/near/NEPs/pull/167> for details*/
     pub minimum_validators_per_shard: u64,
     ///Number of block producer seats at genesis.
     pub num_block_producer_seats: u64,
-    ///Defines number of shards and number of block producer seats per each shard at genesis.
-    pub num_block_producer_seats_per_shard: ::std::vec::Vec<u64>,
     ///Expected number of blocks per year
     pub num_blocks_per_year: u64,
     ///Online maximum threshold above which validator gets full reward.
@@ -3974,6 +3979,19 @@ pub struct RpcReceiptResponse {
     pub receipt: ReceiptEnumView,
     pub receipt_id: CryptoHash,
     pub receiver_id: AccountId,
+}
+///`RpcReceiptToTxRequest`
+///
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+pub struct RpcReceiptToTxRequest {
+    pub receipt_id: CryptoHash,
+}
+///`RpcReceiptToTxResponse`
+///
+#[derive(::serde::Deserialize, ::serde::Serialize, Clone, Debug)]
+pub struct RpcReceiptToTxResponse {
+    pub sender_account_id: AccountId,
+    pub transaction_hash: CryptoHash,
 }
 ///`RpcSendTransactionRequest`
 ///
@@ -5640,6 +5658,8 @@ on runtime.*/
     pub linear_op_base_cost: u64,
     ///Unit gas cost of a linear operation
     pub linear_op_unit_cost: u64,
+    ///See [VMConfig::one_yocto_on_promise](crate::vm::Config::one_yocto_on_promise).
+    pub one_yocto_on_promise: bool,
     ///See [VMConfig::reftypes_bulk_memory](crate::vm::Config::reftypes_bulk_memory).
     pub reftypes_bulk_memory: bool,
     ///Gas cost of a regular operation.
