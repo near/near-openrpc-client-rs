@@ -75,6 +75,8 @@ pub struct NearRpcClient {
     request_id: AtomicU64,
 }
 
+// Keep the public Error::Rpc payload unboxed for API compatibility.
+#[allow(clippy::result_large_err)]
 impl NearRpcClient {
     /// Create a new client with a custom URL.
     pub fn new(url: impl Into<String>) -> Self {
